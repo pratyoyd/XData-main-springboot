@@ -1,0 +1,326 @@
+
+
+%------------------------------------------------------------
+%MUTATION TYPE: DATASET TO KILL DISTINCT MUTATIONS 
+%------------------------------------------------------------
+
+DATATYPE 
+ID = _ID__00128 | _ID__12345 | _ID__19991 | _ID__23121 | _ID__44553 | _ID__45678 | _ID__54321 | _ID__55739 | _ID__70557 | _ID__76543 | _ID__76653 | _ID__98765 | _ID__98988 | _ID__ID_u14 | _ID__ID_u15 | _ID__ID_u16 | _ID__ID_u17 | _ID__ID_u18 | _ID__ID_u19 | _ID__ID_u20 | NULL_ID_1 | NULL_ID_2 | NULL_ID_3 | NULL_ID_4 END
+;ISNULL_ID : ID -> BOOLEAN;
+ASSERT NOT ISNULL_ID(_ID__00128);
+ASSERT NOT ISNULL_ID(_ID__12345);
+ASSERT NOT ISNULL_ID(_ID__19991);
+ASSERT NOT ISNULL_ID(_ID__23121);
+ASSERT NOT ISNULL_ID(_ID__44553);
+ASSERT NOT ISNULL_ID(_ID__45678);
+ASSERT NOT ISNULL_ID(_ID__54321);
+ASSERT NOT ISNULL_ID(_ID__55739);
+ASSERT NOT ISNULL_ID(_ID__70557);
+ASSERT NOT ISNULL_ID(_ID__76543);
+ASSERT NOT ISNULL_ID(_ID__76653);
+ASSERT NOT ISNULL_ID(_ID__98765);
+ASSERT NOT ISNULL_ID(_ID__98988);
+ASSERT NOT ISNULL_ID(_ID__ID_u14);
+ASSERT NOT ISNULL_ID(_ID__ID_u15);
+ASSERT NOT ISNULL_ID(_ID__ID_u16);
+ASSERT NOT ISNULL_ID(_ID__ID_u17);
+ASSERT NOT ISNULL_ID(_ID__ID_u18);
+ASSERT NOT ISNULL_ID(_ID__ID_u19);
+ASSERT NOT ISNULL_ID(_ID__ID_u20);
+ASSERT ISNULL_ID(NULL_ID_1);
+ASSERT ISNULL_ID(NULL_ID_2);
+ASSERT ISNULL_ID(NULL_ID_3);
+ASSERT ISNULL_ID(NULL_ID_4);
+
+
+DATATYPE 
+NAME = _NAME__Snow | _NAME__Tanaka | _NAME__Bourikas | _NAME__Peltier | _NAME__Aoi | _NAME__Brandt | _NAME__Zhang | _NAME__Sanchez | _NAME__Shankar | _NAME__Williams | _NAME__Chavez | _NAME__Levy | _NAME__Brown | _NAME__NAME_u14 | _NAME__NAME_u15 | _NAME__NAME_u16 | _NAME__NAME_u17 | _NAME__NAME_u18 | _NAME__NAME_u19 | _NAME__NAME_u20 | NULL_NAME_1 | NULL_NAME_2 | NULL_NAME_3 | NULL_NAME_4 END
+;ISNULL_NAME : NAME -> BOOLEAN;
+ASSERT NOT ISNULL_NAME(_NAME__Snow);
+ASSERT NOT ISNULL_NAME(_NAME__Tanaka);
+ASSERT NOT ISNULL_NAME(_NAME__Bourikas);
+ASSERT NOT ISNULL_NAME(_NAME__Peltier);
+ASSERT NOT ISNULL_NAME(_NAME__Aoi);
+ASSERT NOT ISNULL_NAME(_NAME__Brandt);
+ASSERT NOT ISNULL_NAME(_NAME__Zhang);
+ASSERT NOT ISNULL_NAME(_NAME__Sanchez);
+ASSERT NOT ISNULL_NAME(_NAME__Shankar);
+ASSERT NOT ISNULL_NAME(_NAME__Williams);
+ASSERT NOT ISNULL_NAME(_NAME__Chavez);
+ASSERT NOT ISNULL_NAME(_NAME__Levy);
+ASSERT NOT ISNULL_NAME(_NAME__Brown);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u14);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u15);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u16);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u17);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u18);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u19);
+ASSERT NOT ISNULL_NAME(_NAME__NAME_u20);
+ASSERT ISNULL_NAME(NULL_NAME_1);
+ASSERT ISNULL_NAME(NULL_NAME_2);
+ASSERT ISNULL_NAME(NULL_NAME_3);
+ASSERT ISNULL_NAME(NULL_NAME_4);
+
+
+DATATYPE 
+DEPT_NAME = _DEPT_uNAME__Finance | _DEPT_uNAME__History | _DEPT_uNAME__Physics | _DEPT_uNAME__Music | _DEPT_uNAME__Comp_d_ubSci_d | _DEPT_uNAME__Biology | _DEPT_uNAME__Elec_d_ubEng_d | _DEPT_uNAME__DEPT_uNAME_u8 | _DEPT_uNAME__DEPT_uNAME_u9 | _DEPT_uNAME__DEPT_uNAME_u10 | _DEPT_uNAME__DEPT_uNAME_u11 | _DEPT_uNAME__DEPT_uNAME_u12 | _DEPT_uNAME__DEPT_uNAME_u13 | _DEPT_uNAME__DEPT_uNAME_u14 | _DEPT_uNAME__DEPT_uNAME_u15 | _DEPT_uNAME__DEPT_uNAME_u16 | _DEPT_uNAME__DEPT_uNAME_u17 | _DEPT_uNAME__DEPT_uNAME_u18 | _DEPT_uNAME__DEPT_uNAME_u19 | _DEPT_uNAME__DEPT_uNAME_u20 | NULL_DEPT_NAME_1 | NULL_DEPT_NAME_2 | NULL_DEPT_NAME_3 | NULL_DEPT_NAME_4 END
+;ISNULL_DEPT_NAME : DEPT_NAME -> BOOLEAN;
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__Finance);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__History);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__Physics);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__Music);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__Comp_d_ubSci_d);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__Biology);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__Elec_d_ubEng_d);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u8);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u9);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u10);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u11);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u12);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u13);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u14);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u15);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u16);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u17);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u18);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u19);
+ASSERT NOT ISNULL_DEPT_NAME(_DEPT_uNAME__DEPT_uNAME_u20);
+ASSERT ISNULL_DEPT_NAME(NULL_DEPT_NAME_1);
+ASSERT ISNULL_DEPT_NAME(NULL_DEPT_NAME_2);
+ASSERT ISNULL_DEPT_NAME(NULL_DEPT_NAME_3);
+ASSERT ISNULL_DEPT_NAME(NULL_DEPT_NAME_4);
+
+
+TOT_CRED : TYPE = SUBTYPE (LAMBDA (x: INT) : (x > -4 AND x < 124) OR (x > -100000 AND x < -99995));
+
+
+ISNULL_TOT_CRED : TOT_CRED -> BOOLEAN;
+ASSERT ISNULL_TOT_CRED(-99996);
+ASSERT ISNULL_TOT_CRED(-99997);
+ASSERT ISNULL_TOT_CRED(-99998);
+ASSERT ISNULL_TOT_CRED(-99999);
+
+
+
+
+
+
+%------------------------------------------------------------
+% Tuple Types for Relations
+ 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% Tuple Types for Relations
+ 
+%------------------------------------------------------------
+STUDENT_TupleType: TYPE = [ID, NAME, DEPT_NAME, TOT_CRED];
+O_STUDENT: ARRAY INT OF STUDENT_TupleType;
+
+
+%------------------------------------------------------------
+%FOREIGN  KEY CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF FOREIGN  KEY CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%PRIMARY KEY CONSTRAINTS
+%------------------------------------------------------------
+ASSERT (O_STUDENT[1].0 = O_STUDENT[2].0 ) => (O_STUDENT[1].1 = O_STUDENT[2].1) AND (O_STUDENT[1].2 = O_STUDENT[2].2) AND (O_STUDENT[1].3 = O_STUDENT[2].3) ;
+
+
+%------------------------------------------------------------
+%END OF PRIMARY KEY CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%UNIQUE CONSTRAINTS  FOR PRIMARY KEY TO SATISFY CONSTRAINED AGGREGATION
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF UNIQUE CONSTRAINTS  FOR PRIMARY KEY TO SATISFY CONSTRAINED AGGREGATION
+%------------------------------------------------------------
+
+
+
+
+%------------------------------------------------------------
+% CONSTRAINTS OF THIS BLOCK 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% CONSTRAINTS FOR THIS CONJUNCT 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% WHERE CLAUSE SUBQUERY BLOCK CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% END OF WHERE CLAUSE SUBQUERY BLOCK CONSTRAINTS 
+%------------------------------------------------------------
+
+ ASSERT((O_STUDENT[1].3 > 30) AND (O_STUDENT[2].3 > 30)  ); 
+
+
+%------------------------------------------------------------
+%GROUP BY CLAUSE CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF GROUP BY CLAUSE CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%HAVING CLAUSE CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF HAVING CLAUSE CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%PARAMETERIZED CLAUSE CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF PARAMETERIZED CLAUSE CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%APPLICATION CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF APPLICATION CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% UNIQUE  KEY CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%END OF UNIQUE  KEY CONSTRAINTS 
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% END OF CONSTRAINTS OF THIS BLOCK 
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+% DISTINCT CONSTRAINTS FOR OUTER BLOCK OF QUERY
+%------------------------------------------------------------
+
+ASSERT (O_STUDENT[1].0  =  O_STUDENT[2].0 );
+ASSERT (O_STUDENT[1].1  =  O_STUDENT[2].1 );
+
+
+
+%------------------------------------------------------------
+% END OF DISTINCT CONSTRAINTS FOR OUTER BLOCK OF QUERY
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+%NULL CONSTRAINTS FOR OUTER BLOCK OF QUERY
+%------------------------------------------------------------
+
+
+
+
+%------------------------------------------------------------
+%END OF NULL CONSTRAINTS FOR OUTER BLOCK OF QUERY
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+%BRANCHQUERY CONSTRAINTS
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+% BRANCH QUERY CONSTRAINTS FOR DIFFERENT GROUP BY COLUMN FROM PRIMARY QUERY
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% BRANCH QUERY CONSTRAINTS FOR DIFFERENT GROUP BY COLUMN FROM OTHER BRANCH QUERIES
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% BRANCH QUERY CONSTRAINTS FOR SAME GROUP BY COLUMN OF A BRANCH QUERY
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% BRANCH QUERY GROUP BY CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% PRIMARY KEY CONSTRAINTS FOR BRANCH QUERY
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+% FOREIGN KEY CONSTRAINTS FOR BRANCH QUERY
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%NOT NULL CONSTRAINTS FOR BRANCHQUERY
+
+
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+%END OF BRANCHQUERY CONSTRAINTS
+%------------------------------------------------------------
+
+
+%------------------------------------------------------------
+%NOT NULL CONSTRAINTS
+
+
+%------------------------------------------------------------
+
+ASSERT NOT ISNULL_DEPT_NAME(O_STUDENT[1].2);
+ASSERT NOT ISNULL_DEPT_NAME(O_STUDENT[2].2);
+ASSERT NOT ISNULL_ID(O_STUDENT[1].0);
+ASSERT NOT ISNULL_ID(O_STUDENT[2].0);
+ASSERT NOT ISNULL_TOT_CRED(O_STUDENT[1].3);
+ASSERT NOT ISNULL_TOT_CRED(O_STUDENT[2].3);
+ASSERT NOT ISNULL_NAME(O_STUDENT[1].1);
+ASSERT NOT ISNULL_NAME(O_STUDENT[2].1);
+
+QUERY FALSE;
+COUNTERMODEL;

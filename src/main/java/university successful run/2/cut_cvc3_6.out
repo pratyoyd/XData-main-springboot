@@ -1,0 +1,2 @@
+ASSERT (O_DEPARTMENT[1] = (_DEPT_uNAME__Biology, _BUILDING__Taylor, 50000));
+ASSERT (O_DEPARTMENT[2] = (_DEPT_uNAME__Biology, _BUILDING__Taylor, 50000));

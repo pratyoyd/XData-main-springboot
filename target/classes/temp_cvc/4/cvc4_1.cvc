@@ -1,0 +1,315 @@
+
+
+;------------------------------------------------------------
+;MUTATION TYPE: DATASET TO KILL JOIN MUTATIONS 
+;------------------------------------------------------------
+(set-logic ALL_SUPPORTED)
+ (set-option:produce-models true) 
+ (set-option :interactive-mode true) 
+ (set-option :produce-assertions true) 
+ (set-option :produce-assignments true) 
+
+
+(declare-datatypes () ((ID (_ID__10101) (_ID__12121)(_ID__15151)(_ID__22222)(_ID__32343)(_ID__33456)(_ID__45565)(_ID__58583)(_ID__76543)(_ID__76766)(_ID__83821)(_ID__98345)(_ID__ID_u13)(_ID__ID_u14)(_ID__ID_u15)(_ID__ID_u16)(_ID__ID_u17)(_ID__ID_u18)(_ID__ID_u19)(_ID__ID_u20) (NULL_ID_1) (NULL_ID_2) (NULL_ID_3) (NULL_ID_4))))
+
+(declare-const notnull_ID ID)
+(define-fun NOTISNULL_ID ((notnull_ID ID)) Bool (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or  (= notnull_ID _ID__22222) (= notnull_ID _ID__15151)) (= notnull_ID _ID__98345)) (= notnull_ID _ID__ID_u17)) (= notnull_ID _ID__ID_u16)) (= notnull_ID _ID__ID_u19)) (= notnull_ID _ID__ID_u18)) (= notnull_ID _ID__83821)) (= notnull_ID _ID__45565)) (= notnull_ID _ID__ID_u20)) (= notnull_ID _ID__ID_u13)) (= notnull_ID _ID__58583)) (= notnull_ID _ID__ID_u15)) (= notnull_ID _ID__ID_u14)) (= notnull_ID _ID__76543)) (= notnull_ID _ID__33456)) (= notnull_ID _ID__32343)) (= notnull_ID _ID__12121)) (= notnull_ID _ID__76766)))
+
+
+(declare-const null_ID ID)
+(define-fun ISNULL_ID ((null_ID ID)) Bool (or (or (or  (= null_ID NULL_ID_1) (= null_ID NULL_ID_2)) (= null_ID NULL_ID_3)) (= null_ID NULL_ID_4)))
+
+
+
+
+(declare-datatypes () ((NAME (_NAME__Einstein) (_NAME__Katz)(_NAME__Singh)(_NAME__Kim)(_NAME__Brandt)(_NAME__El_ubSaid)(_NAME__Wu)(_NAME__Srinivasan)(_NAME__Crick)(_NAME__Gold)(_NAME__Califieri)(_NAME__Mozart)(_NAME__NAME_u13)(_NAME__NAME_u14)(_NAME__NAME_u15)(_NAME__NAME_u16)(_NAME__NAME_u17)(_NAME__NAME_u18)(_NAME__NAME_u19)(_NAME__NAME_u20) (NULL_NAME_1) (NULL_NAME_2) (NULL_NAME_3) (NULL_NAME_4))))
+
+(declare-const notnull_NAME NAME)
+(define-fun NOTISNULL_NAME ((notnull_NAME NAME)) Bool (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or  (= notnull_NAME _NAME__Crick) (= notnull_NAME _NAME__Mozart)) (= notnull_NAME _NAME__NAME_u13)) (= notnull_NAME _NAME__NAME_u14)) (= notnull_NAME _NAME__NAME_u15)) (= notnull_NAME _NAME__Katz)) (= notnull_NAME _NAME__NAME_u20)) (= notnull_NAME _NAME__Kim)) (= notnull_NAME _NAME__Gold)) (= notnull_NAME _NAME__El_ubSaid)) (= notnull_NAME _NAME__Srinivasan)) (= notnull_NAME _NAME__Singh)) (= notnull_NAME _NAME__Califieri)) (= notnull_NAME _NAME__Brandt)) (= notnull_NAME _NAME__Wu)) (= notnull_NAME _NAME__NAME_u16)) (= notnull_NAME _NAME__NAME_u17)) (= notnull_NAME _NAME__NAME_u18)) (= notnull_NAME _NAME__NAME_u19)))
+
+
+(declare-const null_NAME NAME)
+(define-fun ISNULL_NAME ((null_NAME NAME)) Bool (or (or (or  (= null_NAME NULL_NAME_4) (= null_NAME NULL_NAME_1)) (= null_NAME NULL_NAME_3)) (= null_NAME NULL_NAME_2)))
+
+
+
+
+(declare-datatypes () ((DEPT_NAME (_DEPT_uNAME__Finance) (_DEPT_uNAME__History)(_DEPT_uNAME__Physics)(_DEPT_uNAME__Music)(_DEPT_uNAME__Comp_d_ubSci_d)(_DEPT_uNAME__Biology)(_DEPT_uNAME__Elec_d_ubEng_d)(_DEPT_uNAME__DEPT_uNAME_u8)(_DEPT_uNAME__DEPT_uNAME_u9)(_DEPT_uNAME__DEPT_uNAME_u10)(_DEPT_uNAME__DEPT_uNAME_u11)(_DEPT_uNAME__DEPT_uNAME_u12)(_DEPT_uNAME__DEPT_uNAME_u13)(_DEPT_uNAME__DEPT_uNAME_u14)(_DEPT_uNAME__DEPT_uNAME_u15)(_DEPT_uNAME__DEPT_uNAME_u16)(_DEPT_uNAME__DEPT_uNAME_u17)(_DEPT_uNAME__DEPT_uNAME_u18)(_DEPT_uNAME__DEPT_uNAME_u19)(_DEPT_uNAME__DEPT_uNAME_u20) (NULL_DEPT_NAME_1) (NULL_DEPT_NAME_2) (NULL_DEPT_NAME_3) (NULL_DEPT_NAME_4))))
+
+(declare-const notnull_DEPT_NAME DEPT_NAME)
+(define-fun NOTISNULL_DEPT_NAME ((notnull_DEPT_NAME DEPT_NAME)) Bool (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or  (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u18) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u19)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u8)) (= notnull_DEPT_NAME _DEPT_uNAME__History)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u10)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u11)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u12)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u13)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u14)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u9)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u15)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u16)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u17)) (= notnull_DEPT_NAME _DEPT_uNAME__Music)) (= notnull_DEPT_NAME _DEPT_uNAME__DEPT_uNAME_u20)) (= notnull_DEPT_NAME _DEPT_uNAME__Elec_d_ubEng_d)) (= notnull_DEPT_NAME _DEPT_uNAME__Physics)) (= notnull_DEPT_NAME _DEPT_uNAME__Comp_d_ubSci_d)) (= notnull_DEPT_NAME _DEPT_uNAME__Biology)))
+
+
+(declare-const null_DEPT_NAME DEPT_NAME)
+(define-fun ISNULL_DEPT_NAME ((null_DEPT_NAME DEPT_NAME)) Bool (or (or (or  (= null_DEPT_NAME NULL_DEPT_NAME_1) (= null_DEPT_NAME NULL_DEPT_NAME_2)) (= null_DEPT_NAME NULL_DEPT_NAME_3)) (= null_DEPT_NAME NULL_DEPT_NAME_4)))
+
+
+
+
+(define-sort r_SALARY() Real)
+(define-fun getSALARY ((r_SALARY Real)) Bool 
+		(and 
+			(>= r_SALARY 40000.0) 
+			(<= r_SALARY 95000.0)) )
+
+
+(declare-const null_SALARY r_SALARY)
+(define-fun ISNULL_SALARY ((null_SALARY r_SALARY)) Bool (or (or (or  (= null_SALARY (- 99996)) (= null_SALARY (- 99997))) (= null_SALARY (- 99998))) (= null_SALARY (- 99999))))
+
+
+
+
+
+(declare-datatypes () ((BUILDING (_BUILDING__Taylor) (_BUILDING__Packard)(_BUILDING__Painter)(_BUILDING__Watson)(_BUILDING__BUILDING_u5)(_BUILDING__BUILDING_u6)(_BUILDING__BUILDING_u7)(_BUILDING__BUILDING_u8)(_BUILDING__BUILDING_u9)(_BUILDING__BUILDING_u10)(_BUILDING__BUILDING_u11)(_BUILDING__BUILDING_u12)(_BUILDING__BUILDING_u13)(_BUILDING__BUILDING_u14)(_BUILDING__BUILDING_u15)(_BUILDING__BUILDING_u16)(_BUILDING__BUILDING_u17)(_BUILDING__BUILDING_u18)(_BUILDING__BUILDING_u19)(_BUILDING__BUILDING_u20) (NULL_BUILDING_1) (NULL_BUILDING_2) (NULL_BUILDING_3) (NULL_BUILDING_4))))
+
+(declare-const notnull_BUILDING BUILDING)
+(define-fun NOTISNULL_BUILDING ((notnull_BUILDING BUILDING)) Bool (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or (or  (= notnull_BUILDING _BUILDING__BUILDING_u10) (= notnull_BUILDING _BUILDING__Painter)) (= notnull_BUILDING _BUILDING__BUILDING_u11)) (= notnull_BUILDING _BUILDING__BUILDING_u12)) (= notnull_BUILDING _BUILDING__BUILDING_u13)) (= notnull_BUILDING _BUILDING__BUILDING_u20)) (= notnull_BUILDING _BUILDING__BUILDING_u18)) (= notnull_BUILDING _BUILDING__BUILDING_u9)) (= notnull_BUILDING _BUILDING__BUILDING_u19)) (= notnull_BUILDING _BUILDING__Watson)) (= notnull_BUILDING _BUILDING__BUILDING_u6)) (= notnull_BUILDING _BUILDING__BUILDING_u14)) (= notnull_BUILDING _BUILDING__BUILDING_u5)) (= notnull_BUILDING _BUILDING__BUILDING_u15)) (= notnull_BUILDING _BUILDING__BUILDING_u8)) (= notnull_BUILDING _BUILDING__BUILDING_u16)) (= notnull_BUILDING _BUILDING__BUILDING_u7)) (= notnull_BUILDING _BUILDING__BUILDING_u17)) (= notnull_BUILDING _BUILDING__Packard)))
+
+
+(declare-const null_BUILDING BUILDING)
+(define-fun ISNULL_BUILDING ((null_BUILDING BUILDING)) Bool (or (or (or  (= null_BUILDING NULL_BUILDING_2) (= null_BUILDING NULL_BUILDING_1)) (= null_BUILDING NULL_BUILDING_4)) (= null_BUILDING NULL_BUILDING_3)))
+
+
+
+
+(define-sort r_BUDGET() Real)
+(define-fun getBUDGET ((r_BUDGET Real)) Bool 
+		(and 
+			(>= r_BUDGET 50000.0) 
+			(<= r_BUDGET 120000.0)) )
+
+
+(declare-const null_BUDGET r_BUDGET)
+(define-fun ISNULL_BUDGET ((null_BUDGET r_BUDGET)) Bool (or (or (or  (= null_BUDGET (- 99996)) (= null_BUDGET (- 99997))) (= null_BUDGET (- 99998))) (= null_BUDGET (- 99999))))
+
+
+
+
+
+
+
+;------------------------------------------------------------
+; Tuple Types for Relations
+ 
+;------------------------------------------------------------
+
+ (declare-datatypes () ((INSTRUCTOR_TupleType(INSTRUCTOR_TupleType (INSTRUCTOR_ID0 ID) (INSTRUCTOR_NAME1 NAME) (INSTRUCTOR_DEPT_NAME2 DEPT_NAME) (INSTRUCTOR_SALARY3 Real) ) )) )
+(declare-fun O_INSTRUCTOR() (Array Int INSTRUCTOR_TupleType))
+
+
+ (declare-datatypes () ((DEPARTMENT_TupleType(DEPARTMENT_TupleType (DEPARTMENT_DEPT_NAME0 DEPT_NAME) (DEPARTMENT_BUILDING1 BUILDING) (DEPARTMENT_BUDGET2 Real) ) )) )
+(declare-fun O_DEPARTMENT() (Array Int DEPARTMENT_TupleType))
+
+
+
+;------------------------------------------------------------
+;DataSet Generated By Nulling: INSTRUCTOR1.DEPT_NAME
+
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;FOREIGN  KEY CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;END OF FOREIGN  KEY CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;PRIMARY KEY CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;END OF PRIMARY KEY CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;UNIQUE CONSTRAINTS  FOR PRIMARY KEY TO SATISFY CONSTRAINED AGGREGATION
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;END OF UNIQUE CONSTRAINTS  FOR PRIMARY KEY TO SATISFY CONSTRAINED AGGREGATION
+;------------------------------------------------------------
+
+
+
+ (assert  (and (not (= (INSTRUCTOR_DEPT_NAME2 (select O_INSTRUCTOR 1) ) (DEPARTMENT_DEPT_NAME0 (select O_DEPARTMENT 1) )))
+		)) 
+
+
+
+;------------------------------------------------------------
+; EQUIVALENCE CLASS CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; SELECTION CLASS CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; ALL CLASS CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; STRING SELECTION CLASS CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; LIKE CLAUSE CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; WHERE CLAUSE SUBQUERY BLOCK CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; END OF WHERE CLAUSE SUBQUERY BLOCK CONSTRAINTS
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+;GROUP BY CLAUSE CONSTRAINTS FOR OUTER QUERY BLOCK 
+;------------------------------------------------------------
+
+
+
+
+;------------------------------------------------------------
+;HAVING CLAUSE CONSTRAINTS FOR OUTER QUERY BLOCK 
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+;END OF HAVING CLAUSE CONSTRAINTS FOR OUTER QUERY BLOCK 
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+;PARAMETERIZED CLAUSE CONSTRAINTS 
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;END OF PARAMETERIZED CLAUSE CONSTRAINTS 
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;APPLICATION CONSTRAINTS 
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;END OF APPLICATION CONSTRAINTS 
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; UNIQUE  KEY CONSTRAINTS 
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;END OF UNIQUE  KEY CONSTRAINTS 
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+;NULL CONSTRAINTS FOR OUTER BLOCK OF QUERY
+;------------------------------------------------------------
+
+
+
+
+;------------------------------------------------------------
+;END OF NULL CONSTRAINTS FOR OUTER BLOCK OF QUERY
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+;BRANCHQUERY CONSTRAINTS
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+; BRANCH QUERY CONSTRAINTS FOR DIFFERENT GROUP BY COLUMN FROM PRIMARY QUERY
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; BRANCH QUERY CONSTRAINTS FOR DIFFERENT GROUP BY COLUMN FROM OTHER BRANCH QUERIES
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; BRANCH QUERY CONSTRAINTS FOR SAME GROUP BY COLUMN OF A BRANCH QUERY
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; BRANCH QUERY GROUP BY CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; PRIMARY KEY CONSTRAINTS FOR BRANCH QUERY
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+; FOREIGN KEY CONSTRAINTS FOR BRANCH QUERY
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;NOT NULL CONSTRAINTS FOR BRANCHQUERY
+
+
+;------------------------------------------------------------
+
+
+
+;------------------------------------------------------------
+;END OF BRANCHQUERY CONSTRAINTS
+;------------------------------------------------------------
+
+
+;------------------------------------------------------------
+;NOT NULL CONSTRAINTS
+
+
+;------------------------------------------------------------
+
+ (assert (NOTISNULL_NAME (INSTRUCTOR_NAME1 (select O_INSTRUCTOR 1) )))
+ (assert (getBUDGET (DEPARTMENT_BUDGET2 (select O_DEPARTMENT 1) )))
+ (assert (NOTISNULL_DEPT_NAME (DEPARTMENT_DEPT_NAME0 (select O_DEPARTMENT 1) )))
+ (assert (NOTISNULL_DEPT_NAME (INSTRUCTOR_DEPT_NAME2 (select O_INSTRUCTOR 1) )))
+ (assert (NOTISNULL_BUILDING (DEPARTMENT_BUILDING1 (select O_DEPARTMENT 1) )))
+ (assert (NOTISNULL_ID (INSTRUCTOR_ID0 (select O_INSTRUCTOR 1) )))
+ (assert (getSALARY (INSTRUCTOR_SALARY3 (select O_INSTRUCTOR 1) )))
+
+(check-sat)
+ (get-value (O_INSTRUCTOR))
+ (get-value (O_DEPARTMENT))
+ 
+(get-assertions) 
+ (get-assignment) 
+(get-model)

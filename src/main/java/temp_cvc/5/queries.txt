@@ -1,0 +1,1 @@
+select student.name,SUM(course.credits) as sum_credits from student left join courses on student.dept_name = courses.dept_name group by student.name

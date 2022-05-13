@@ -1,0 +1,1 @@
+select student.name, department.dept_name, SUM(course.credits) as sum_credits from department left join student on student.dept_name = department.dept.name left join courses on courses.dept_name = department.dept_name  where student.tot_cred < 30 group by department.dept_name, student.name order by sum_credits limit 2 

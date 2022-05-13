@@ -1,0 +1,1 @@
+select * from instructor, department where instructor.dept_name = department.dept_name
