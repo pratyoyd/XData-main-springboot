@@ -489,7 +489,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		
 		
 		
-		String basePath="test/universityTest";
+		String basePath="src/main/java/test/universityTest";
 		readFromJsonAPI(basePath);
 		String databaseName = "";
 		String databaseUser = "";

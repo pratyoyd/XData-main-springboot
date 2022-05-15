@@ -68,16 +68,8 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-    <groupId>net.sf.jsqlparser</groupId>
-    <artifactId>jsqlparser</artifactId>
-    <version>0.8.0</version>
-</dependency>
-<dependency>
-    <groupId>net.sf.jsqlparser</groupId>
-    <artifactId>jsqlparser</artifactId>
-    <version>0.7.0</version>
-</dependency>
+
+
 <dependency>
 <groupId>dk.brics</groupId>
 <artifactId>automaton</artifactId>
@@ -104,11 +96,19 @@
     <artifactId>uncommons-maths</artifactId>
     <version>1.2.1</version>
 </dependency>
+
 <dependency>
-<groupId>com.github.jsqlparser</groupId>
-<artifactId>jsqlparser</artifactId>
-<version>0.9.7</version>
+<groupId>edu.iisc</groupId>
+<artifactId>jsqlparser-SNAPSHOT</artifactId>
+<version>1.0</version>
 </dependency>
+<dependency>
+    <groupId>com.google.collections</groupId>
+    <artifactId>google-collections</artifactId>
+    <version>1.0-rc2</version>
+</dependency>
+
+
 
 
 		
