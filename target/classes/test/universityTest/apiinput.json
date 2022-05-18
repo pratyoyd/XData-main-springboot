@@ -15,14 +15,14 @@
   	{"name":"lineitem", "columns":[{"name":"l_orderkey", "type":"integer", "is_nullable":"n"},{"name":"l_partkey", "type":"integer", "is_nullable":"n"},{"name":"l_suppkey", "type":"integer", "is_nullable":"n"},{"name":"l_linenumber", "type":"integer", "is_nullable":"n"},{"name":"l_quantity", "type":"numeric(15,2)", "is_nullable":"n"},{"name":"l_extendedprice", "type":"numeric(15,2)", "is_nullable":"n"},{"name":"l_discount", "type":"numeric(15,2)", "is_nullable":"n"},{"name":"l_tax", "type":"numeric(15,2)", "is_nullable":"n"},{"name":"l_returnflag", "type":"char(1)", "is_nullable":"n"},{"name":"l_linestatus", "type":"char(1)", "is_nullable":"n"},{"name":"l_shipdate", "type":"date", "is_nullable":"n"},{"name":"l_commitdate", "type":"date", "is_nullable":"n"},{"name":"l_receiptdate", "type":"date", "is_nullable":"n"},{"name":"l_shipinstruct", "type":"char(25)", "is_nullable":"n"},{"name":"l_shipmode", "type":"char(10)", "is_nullable":"n"},{"name":"l_comment", "type":"varchar(152)", "is_nullable":"y"}],"primary_key":"l_orderkey, l_linenumber"}
   ],
   
-  "inputQuery": {
+  "hiddenQuery(Student)": {
     "isExecutable": "n",
     "executablePath": "",
     "executableCommand": "",
     "sqlString": "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE* (1 -  L_DISCOUNT)) AS REVENUE,O_ORDERDATE, O_SHIPPRIORITY FROM CUSTOMER, LINEITEM, ORDERS WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND O_ORDERDATE <= '1995-03-14' AND L_SHIPDATE >= '1995-03-16' AND C_MKTSEGMENT ='BUILDING'GROUP BY L_ORDERKEY, O_SHIPPRIORITY, O_ORDERDATE ORDER BY REVENUE DESC, O_ORDERDATE ASC LIMIT 10",
     "sqlProto": {}
   },
-  "extractedQuery": {
+  "extractedQuery(Instructor)": {
     "sqlString": "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE* (1 -  L_DISCOUNT)) AS REVENUE,O_ORDERDATE, O_SHIPPRIORITY FROM CUSTOMER, LINEITEM, ORDERS WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND O_ORDERDATE <= '1995-03-14' AND L_SHIPDATE >= '1995-03-15' AND C_MKTSEGMENT ='BUILDING'GROUP BY L_ORDERKEY, O_SHIPPRIORITY, O_ORDERDATE ORDER BY REVENUE DESC, O_ORDERDATE ASC LIMIT 10",
     "sqlProto": {}
   }

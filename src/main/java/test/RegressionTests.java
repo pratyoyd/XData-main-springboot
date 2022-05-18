@@ -738,12 +738,12 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		
 		
 	}
-	public static void readFromJsonAPI(JSONObject unmasqueOutput) throws IOException { 
+	public static JSONObject readFromJsonAPI(JSONObject unmasqueOutput) throws IOException { 
 		JSONParser parser = new JSONParser();
 		//JSONObject unmasqueOutput = (JSONObject) parser.parse(new FileReader(basePath+File.separator+"apiinput.json"));
-		JSONObject extractedQueryJSON = (JSONObject)unmasqueOutput.get("extractedQuery");
+		JSONObject extractedQueryJSON = (JSONObject)unmasqueOutput.get("extractedQuery(Instructor)");
 		String testQuery = (String)extractedQueryJSON.get("sqlString");
-		JSONObject inputQueryJSON = (JSONObject)unmasqueOutput.get("inputQuery");
+		JSONObject inputQueryJSON = (JSONObject)unmasqueOutput.get("hiddenQuery(Student)");
 		String mutantQuery = (String)inputQueryJSON.get("sqlString");
 		System.out.println(testQuery);
 		databaseName = (String)unmasqueOutput.get("databaseName");
@@ -774,6 +774,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		JSONObject jsonobject = r.returnXDataResult(testQuery, mutantQuery, schema, sampleData);
 		System.out.println(jsonobject);
 		//System.out.println(r.returnXDataResult(testQuery, mutantQuery, schema, sampleData));
+		return jsonobject;
 		
 		
 	}
