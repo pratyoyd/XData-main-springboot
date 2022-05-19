@@ -80,7 +80,7 @@ public class Utility {
 		}
 		return columnString;
 	}
-	
+	/*
 	private static String getFromClause (QueryTreeNode node, QueryParser qp, HashMap<String, String> currentAT) throws Exception{
 		if (node instanceof HalfOuterJoinNode) {
 			HalfOuterJoinNode halfOuterJoinNode = (HalfOuterJoinNode) node;
@@ -151,6 +151,7 @@ public class Utility {
 		}
 		return null;
 	}
+	*/
 	
 	private static String getWhereClause(Object clause, boolean removeConstants) throws Exception{
 		if (clause ==null) {
@@ -246,13 +247,13 @@ public class Utility {
 				} else if (((NumericConstantNode)binaryOperatorNode.getRightOperand()).getValue() instanceof SQLDouble) {
 					rightPart = new Double(((SQLDouble)((NumericConstantNode)binaryOperatorNode.getRightOperand()).getValue()).getDouble()).toString();
 				}
-			} else if (binaryOperatorNode.getRightOperand() instanceof BinaryArithmeticOperatorNode) {
+			} /*else if (binaryOperatorNode.getRightOperand() instanceof BinaryArithmeticOperatorNode) {
 				BinaryArithmeticOperatorNode binaryArithmeticOperatorNode = (BinaryArithmeticOperatorNode) binaryOperatorNode.getRightOperand();
 				
 				rightPart = "(" + getWhereClause(binaryArithmeticOperatorNode.getLeftOperand(),false) 
 					+ binaryArithmeticOperatorNode.getOperator1() + getWhereClause(binaryArithmeticOperatorNode.getRightOperand(),false) + ")"; 
 			}
-			return leftPart +" "+binaryOperatorNode.getOperator1()+" "+rightPart;
+			return leftPart +" "+binaryOperatorNode.getOperator1()+" "+rightPart;*/
 		} else if (clause instanceof InListOperatorNode) {
 			InListOperatorNode inListOperatorNode = (InListOperatorNode) clause;
 			ValueNode valueNode = inListOperatorNode.getLeftOperand();
@@ -266,6 +267,7 @@ public class Utility {
 				}
 				ValueNodeList valueNodeList = inListOperatorNode.getRightOperandList();
 				String str2 = "";
+				/*
 				for (int i=0;i<valueNodeList.size();i++) {
 					if (valueNodeList.getNodeVector().get(i) instanceof CharConstantNode) {
 						CharConstantNode charConstantNode = (CharConstantNode) valueNodeList.getNodeVector().get(i);
@@ -280,6 +282,7 @@ public class Utility {
 						throw new Exception("getStringWhereClause needs more programming ");
 					}
 				}
+				*/
 				str2 = str2.substring(1,str2.length());
 				return str1 +" IN ("+str2 +")";
 			} else {
@@ -305,11 +308,11 @@ public class Utility {
 			throw new Exception("getStringWhereClause needs more programming ");
 		} else if (clause instanceof SubqueryNode) {
 			SubqueryNode subqueryNode = (SubqueryNode) clause;
-			String columnName = getWhereClause(subqueryNode.getLeftOperand(),false); 
+			String columnName = "";//getWhereClause(subqueryNode.getLeftOperand(),false); 
 			if (subqueryNode.getTableName() != null) {
 				columnName = subqueryNode.getTableName() + "." +columnName;
 			} 
-			String subQueryString = getQueryString(subqueryNode.getResultSet());
+			String subQueryString = "";//getQueryString(subqueryNode.getResultSet());
 			return columnName + " IN (" + subQueryString +")";
 		} else if (clause instanceof LikeEscapeOperatorNode) {
 			LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode) clause;
@@ -337,9 +340,10 @@ public class Utility {
 		} else {
 			throw new Exception("getStringWhereClause needs more programming ");
 		}
+		return rightPart;
 	}
 
-	public static String getGroupByClauseString(GroupByList groupByList) {
+	/*public static String getGroupByClauseString(GroupByList groupByList) {
 		String str = "";
 		if (groupByList != null) {
 			Vector v = groupByList.getNodeVector();
@@ -363,7 +367,8 @@ public class Utility {
 		
 		return str.equals("")?"":" GROUP BY "+str;
 	}
-	
+	*/
+	/*
 	public static String getGroupByClauseAttributes(GroupByList groupByList) {
 		String str = "";
 		if (groupByList != null) {
@@ -388,7 +393,8 @@ public class Utility {
 		
 		return str;
 	}
-	
+	*/
+	/*
 	public static String getSelectClauseString(ResultSetNode rsNode) throws Exception{
 		String selectStr = getSelectClause(rsNode.getResultColumns());
 		String distinctStr = "";
@@ -397,6 +403,8 @@ public class Utility {
 		}
 		return "SELECT "+distinctStr+ selectStr;
 	}
+	*/
+	/*
 	
 	public static String getFromClauseString(ResultSetNode rsNode, QueryParser qp, HashMap<String, String> currentAT) throws Exception{
 		String tempStr = "";
@@ -410,7 +418,8 @@ public class Utility {
 		return fromClause;
 		
 	}
-	
+	*/
+	/*
 	public static String getWhereClauseString(ResultSetNode rsNode, boolean removeContants) throws Exception{
 		Object object = ((SelectNode)rsNode).getWhereClause();
 		String whereClause = getWhereClause(object,removeContants);
@@ -418,7 +427,8 @@ public class Utility {
 			whereClause = " WHERE "+whereClause+" ";
 		return whereClause;
 	}
-	
+	*/
+	/*
 	public static String getQueryString (ResultSetNode rsNode) throws Exception {
 		String selectClauseString = getSelectClauseString(rsNode);
 		String fromClauseString = getFromClauseString(rsNode, null, null);
@@ -427,7 +437,7 @@ public class Utility {
 		
 		return selectClauseString + fromClauseString + whereClauseString + groupByClauseString;
 	}
-	
+	*/
 	public static boolean isContantWhereClause(Object clause, Vector joinAttribute) throws Exception{
 		if (clause ==null) {
 			return false;
@@ -501,7 +511,7 @@ public class Utility {
 			if (valueNode instanceof ColumnReference) {
 				boolean inRight = false;
 				ValueNodeList valueNodeList = inListOperatorNode.getRightOperandList();
-				
+				/*
 				for (int i=0;i<valueNodeList.size();i++) {
 					if (valueNodeList.getNodeVector().get(i) instanceof CharConstantNode || valueNodeList.getNodeVector().get(i) instanceof NumericConstantNode) {
 						if(joinAttribute.contains(valueNode.getColumnName().toString()))
@@ -510,7 +520,7 @@ public class Utility {
 						throw new Exception("getStringWhereClause needs more programming ");
 					}
 				}
-				
+				*/
 				return inRight ;
 			} else {
 				throw new Exception("getStringWhereClause needs more programming ");
@@ -562,6 +572,7 @@ public class Utility {
 	public static void main(String[] args) {
 		//String queryString = "select *   from rollhist right  outer join department on (rollhist.deptcode = department.deptcode), program where rollno = '11'";
 		String queryString = "select count(studentid) from rollhist";
+		/*
 		SQLParser sqlParser = new SQLParser();
 		try {
 			ResultSetNode rsNode = ((CursorNode)sqlParser.Statement(queryString, null)).getResultSetNode();
@@ -570,6 +581,7 @@ public class Utility {
 			logger.log(Level.SEVERE,e.getMessage(),e);
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 }

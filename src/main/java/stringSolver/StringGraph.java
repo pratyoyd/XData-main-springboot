@@ -155,7 +155,7 @@ public class StringGraph {
 		}
 		return true;
 	}
-	
+/*	
 	String getSmallestStringFromAutomata(int varNo){
 		int max=node[varNo].maxL;
 		int min=node[varNo].minL;
@@ -173,7 +173,7 @@ public class StringGraph {
 	
 	/**
 	 * Returns the set of accepted strings of the given length.
-	 */
+	 
 	public static String getStrings(Automaton a, int min,int max) {
 		String str=null;
 		if (a.isSingleton() && a.singleton.length() >=max && a.singleton.length()<=min)
@@ -182,14 +182,14 @@ public class StringGraph {
 			str=getStrings(a.initial, new StringBuilder(),min,max,null, 0);
 		return str;
 	}
-	
+
 	private static String getStrings(State s, StringBuilder path, int min,int max,Set<Integer> notEqualLengths,int length) {
 		if(length>=min && length<=max && s.accept && !notEqualLengths.contains(length)){
 			//strings.add(path.toString());
 			return path.toString();
 		}
 		
-		
+	
 		if(length>max)
 			return null;
 		else{
@@ -205,7 +205,7 @@ public class StringGraph {
 		}
 		return null;
 	}
-		
+		*/
 		
 		
 		
@@ -229,7 +229,7 @@ public class StringGraph {
 	
 	
 	
-	HashMap<Integer,String> solve(){
+	/*HashMap<Integer,String> solve(){
 		HashMap<Integer,String> map= new HashMap<Integer,String>();
 		while(true){
 			boolean flag=false;
@@ -316,7 +316,8 @@ public class StringGraph {
 		}
 		return map;
 	}
-	
+	*/
+	/*
 	Map<Integer,String> findValuesFor(Vector<Integer> v){
 		
 		Map<Integer,String> value=new HashMap<Integer,String>();
@@ -344,6 +345,7 @@ public class StringGraph {
 		}
 		return value;
 	}
+	*/
 	
 	
 }

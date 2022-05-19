@@ -85,7 +85,7 @@ public class OperateOnJoin {
 			t.add(temp);
 			leftFle.add(temp);
 			//Util.updateTableOccurrences(isFromSubquery, isWhereSubquery, temp,qParser);
-		} else if (joinNode.getLeftResultSet() instanceof FromSubquery) {
+		} /*else if (joinNode.getLeftResultSet() instanceof FromSubquery) {
 			FromListElement temp;
 			//temp = 
 			OperateOnSubQuery.OperateOnSubquery( (FromSubquery) joinNode.getLeftResultSet(), allConds, leftChild, true, false,qParser);
@@ -94,6 +94,7 @@ public class OperateOnJoin {
 			leftFle.add(temp);
 			leftF.setTabs(leftFle);
 		}
+		*/
 
 		// if right child is a join node then recurssively traverse the node
 		if (joinNode.getRightResultSet() instanceof JoinNode) {
@@ -109,7 +110,7 @@ public class OperateOnJoin {
 					.getRightResultSet(), true, aliasName, rightChild, qParser, isFromSubquery, isWhereSubquery);
 			t.add(temp);
 			rightFle.add(temp);
-		} else if (joinNode.getRightResultSet() instanceof FromSubquery) {
+		} /*else if (joinNode.getRightResultSet() instanceof FromSubquery) {
 			FromListElement temp;
 			//temp = 
 			OperateOnSubQuery.OperateOnSubquery((FromSubquery) joinNode.getRightResultSet(), allConds, rightChild,true,false,qParser);
@@ -117,7 +118,7 @@ public class OperateOnJoin {
 			t.add(temp);
 			rightFle.add(temp);
 			rightF.setTabs(rightFle);
-		}
+		}*/
 
 		jtan.setTabs(t);
 
@@ -128,7 +129,7 @@ public class OperateOnJoin {
 		leftSet = new Vector<Node>();
 		rightSet = new Vector<Node>();
 		set = new Vector<Node>();
-
+/*
 		if (joinNode.getUsingClause() != null || joinNode.naturalJoin) {
 
 			ResultColumnList columnList=null;
@@ -138,7 +139,7 @@ public class OperateOnJoin {
 			 * If any side of join is sub query then 
 			 * the join conditions should contain only the projected columns, which
 			 * may be aliased,  of the sub query
-			 */
+			 
 
 			if (joinNode.getRightResultSet() instanceof FromSubquery && joinNode.getLeftResultSet() instanceof FromSubquery ){//If sub query then we should add only the projected columns
 
@@ -153,6 +154,7 @@ public class OperateOnJoin {
 					rightSet = set;
 				columnList=joinNode.getCommonColumnsForNaturalJoin(l);
 			}
+			
 			else if (joinNode.getRightResultSet() instanceof FromSubquery ) {//If sub query then we should add only the projected columns
 
 				List <String> l = getCommonColumnsForNaturalJoin(t.get(0), qParser.getFromClauseSubqueries().get(qParser.getFromClauseSubqueries().size()-1).getProjectedCols(),qParser); 
@@ -206,7 +208,7 @@ public class OperateOnJoin {
 				 * x. Hence we need to specify 2 join conditions as: A.x = R.x
 				 * and B.x = R.x. These joins are just used to build equivalence
 				 * classes.
-				 */
+				 
 
 				//FIXME: Mahesh add join conditions to the sub queries separately
 				for (int j = 0; j < joinColumns1.size(); j++) {
@@ -222,7 +224,7 @@ public class OperateOnJoin {
 						boolean leftSubquery = false;
 						/*
 						 * Get equi joins also in the Node form
-						 */
+						 
 						Column leftCol = joinColumns1.get(j);
 						Node left = new Node();
 						if (joinNode.getLeftResultSet() instanceof FromSubquery){ 
@@ -346,13 +348,13 @@ public class OperateOnJoin {
 
 			}
 			allConds.add(joinCond);
-		} else {
+		} *//*else {
 			/*
 			 * For join conditions specified as "Join On (Expr)" where Expr is
 			 * an expression involving attributes from the two children of the
 			 * join. R.a = S.b + 1 R.a = S.b + T.c R.a + Q.d = S.b + T.c R.a +
 			 * Q.d -1 = S.b + T.c + 1 etc.
-			 */
+			 
 			// TODO modify the equivalence class in case of subquery
 			//Vector<BinaryRelationalOperatorNode> nodes = null;
 			//nodes = operateOnJoinClause(joinNode.getJoinClause());
@@ -368,7 +370,7 @@ public class OperateOnJoin {
 
 			jtn.addJoinPred(n);
 			jtn.setOnNode(preds);
-		}
+		}*/
 		//JoinTreeNode processing
 		jtn.setLeft(leftChild);
 		jtn.setRight(rightChild);

@@ -577,130 +577,133 @@ public class QueryParser implements Serializable{
 		this.fromListElements=new Vector<FromListElement>();
 	}
 
-	public String getModifiedQuery(ResultSetNode rsNode, boolean debug,
-			QueryParser qp) throws Exception {
-		HashMap<String, String> currentAT = new HashMap<String, String>();
-		// this.currentAliasTables = new HashMap<String, String>();
-		String fromClauseString = Utility.getFromClauseString(rsNode, qp,
-				currentAT);
-		// currentAT.putAll(this.getCurrentAliasTables());
-		String whereCluase = Utility.getWhereClauseString(rsNode, true);
-		String groupByClause = Utility
-				.getGroupByClauseAttributes(((SelectNode) rsNode)
-						.getGroupByList());
-
-		/*
-		 * Currently not handling Group by cluase if (getGroupByColumns() !=
-		 * null && getGroupByColumns().size()>0) { remainingQuery =
-		 * remainingQuery.substring(0,remainingQuery.indexOf("GROUP BY")); }
-		 */
-
-		String selectClause = "SELECT ";
-		// boolean b = false;
-
-		for (String aliasName : currentAT.keySet()) {
-			if (currentAT.get(aliasName).equalsIgnoreCase("SUBQUERY")) {
-				selectClause = selectClause + aliasName + ".*, ";
-			} else {
-				String tableName = query.getTableOfAlias(aliasName).get(0);
-				selectClause = selectClause + aliasName + ".CTID AS "
-						+ tableName + "CTID, ";
-				selectClause = selectClause + aliasName + ".*, ";
-			}
-		}
-		/*
-		 * for(String tableName : query.getFromTables().keySet()){ Table table =
-		 * query.getFromTables().get(tableName); tableName =
-		 * tableName.toUpperCase(); if(table.getAliasName()!=null) selectClause
-		 * += table.getAliasName(); else selectClause += tableName;
-		 * 
-		 * selectClause += ".CTID AS "; selectClause += tableName+"CTID, ";
-		 * 
-		 * if(table.getAliasName()!=null) selectClause +=
-		 * table.getAliasName()+".*, "; else selectClause += tableName+".*, "; }
-		 */
-		selectClause = selectClause.substring(0, selectClause.length() - 2)
-				.toString();
-
-		// This code checks if the projected columns have a foreign key
-		// relationship with any other table that is not projected.
-		// If so it adds the table to the projection list.
-		// Info added for JoinClause
-		Graph<Table, JoinClauseInfo> joinGraph = query.getJoinGraph();
-		// Graph<Table,ForeignKey> foreignKeyGraph =
-		// tableMap.getForeignKeyGraph();
-		for (String tableName : query.getFromTables().keySet()) {
-			Table table = query.getFromTables().get(tableName);
-			if (table.hasForeignKey()) {
-				for (String fKeyName : table.getForeignKeys().keySet()) {
-					ForeignKey fKey = table.getForeignKey(fKeyName);
-					Vector<Column> fKeyColumns = fKey.getFKeyColumns();
-					// Vector<Column> refKeyColumns =
-					// fKey.getReferenceKeyColumns();
-					boolean joinFound = false;
-					if (joinGraph.getNeighbours(table) != null) {
-						for (Table joinTable : joinGraph.getNeighbours(table)
-								.keySet()) {
-							for (JoinClauseInfo joinClauseInfo : joinGraph
-									.getEdges(table, joinTable)) {
-								if (joinClauseInfo.contains(fKey
-										.getFKTablename())
-										&& joinClauseInfo.contains(fKey
-												.getReferenceTable()
-												.getTableName())) {
-									// if(joinClause.contains(fKeyColumns) &&
-									// joinClause.contains(refKeyColumns)){
-									joinFound = true;
-								}
-							}
-						}
-					}
-					if (!joinFound) {
-						Table referenceTable = fKey.getReferenceTable();
-						if (query.getBaseRelation().containsKey(
-								referenceTable.getTableName())) {
-							continue;
-						}
-						if (!selectClause.contains(referenceTable.getTableName())) {
-							fromClauseString += JoinClauseInfo.leftOuterJoin+ " " + referenceTable.getTableName()+ " ON (";
-							for (Column fKeyColumn : fKeyColumns) {
-								if (table.getAliasName() != null)
-									fromClauseString += table.getAliasName()+ "." + fKeyColumn.getColumnName()+ "=";
-								else
-									fromClauseString += table.getTableName()+ "." + fKeyColumn.getColumnName()+ "=";
-
-								fromClauseString += fKeyColumn
-										.getReferenceTableName()
-										+ "."
-										+ fKeyColumn.getReferenceColumn()
-										.getColumnName();
-								fromClauseString += " AND ";
-							}
-							fromClauseString = fromClauseString.substring(0,
-									fromClauseString.length() - 5);
-							fromClauseString += ")";
-
-							if (!query.getFromTables().containsKey(referenceTable)) {
-								selectClause += ", "+ referenceTable.getTableName()+ ".CTID AS "+ referenceTable.getTableName()	+ "CTID";
-								selectClause += ", "+ referenceTable.getTableName() + ".* ";
-							} 
-						}
-					}
-				}
-			}// till here: add FK tables to projection list
-		}
-  
-		query.setQueryForGroupBy("SELECT DISTINCT " + groupByClause
-				+ fromClauseString + whereCluase);
-		// TODO Why is group by clause not added? 
-		String modifiedQueryString = selectClause + fromClauseString
-				+ whereCluase;// +" order by random()";
-		this.currentAliasTables = new HashMap<String, String>();
-		if (debug)
-			logger.log(Level.INFO,"\nModified Query : " + modifiedQueryString);
-		return modifiedQueryString;  
-	} 
-          
+//	public String getModifiedQuery(ResultSetNode rsNode, boolean debug,
+//			QueryParser qp) throws Exception {
+//		HashMap<String, String> currentAT = new HashMap<String, String>();
+//		// this.currentAliasTables = new HashMap<String, String>();
+//		String fromClauseString = Utility.getFromClauseString(rsNode, qp,
+//				currentAT);
+//		// currentAT.putAll(this.getCurrentAliasTables());
+//		String whereCluase = Utility.getWhereClauseString(rsNode, true);
+//		/*
+//		String groupByClause = Utility
+//				.getGroupByClauseAttributes(((SelectNode) rsNode)
+//						.getGroupByList());
+//*/
+//		/*
+//		 * Currently not handling Group by cluase if (getGroupByColumns() !=
+//		 * null && getGroupByColumns().size()>0) { remainingQuery =
+//		 * remainingQuery.substring(0,remainingQuery.indexOf("GROUP BY")); }
+//		 */
+//
+//		String selectClause = "SELECT ";
+//		// boolean b = false;
+//
+//		for (String aliasName : currentAT.keySet()) {
+//			if (currentAT.get(aliasName).equalsIgnoreCase("SUBQUERY")) {
+//				selectClause = selectClause + aliasName + ".*, ";
+//			} else {
+//				String tableName = query.getTableOfAlias(aliasName).get(0);
+//				selectClause = selectClause + aliasName + ".CTID AS "
+//						+ tableName + "CTID, ";
+//				selectClause = selectClause + aliasName + ".*, ";
+//			}
+//		}
+//		/*
+//		 * for(String tableName : query.getFromTables().keySet()){ Table table =
+//		 * query.getFromTables().get(tableName); tableName =
+//		 * tableName.toUpperCase(); if(table.getAliasName()!=null) selectClause
+//		 * += table.getAliasName(); else selectClause += tableName;
+//		 * 
+//		 * selectClause += ".CTID AS "; selectClause += tableName+"CTID, ";
+//		 * 
+//		 * if(table.getAliasName()!=null) selectClause +=
+//		 * table.getAliasName()+".*, "; else selectClause += tableName+".*, "; }
+//		 */
+//		selectClause = selectClause.substring(0, selectClause.length() - 2)
+//				.toString();
+//
+//		// This code checks if the projected columns have a foreign key
+//		// relationship with any other table that is not projected.
+//		// If so it adds the table to the projection list.
+//		// Info added for JoinClause
+//		Graph<Table, JoinClauseInfo> joinGraph = query.getJoinGraph();
+//		// Graph<Table,ForeignKey> foreignKeyGraph =
+//		// tableMap.getForeignKeyGraph();
+//		for (String tableName : query.getFromTables().keySet()) {
+//			Table table = query.getFromTables().get(tableName);
+//			if (table.hasForeignKey()) {
+//				for (String fKeyName : table.getForeignKeys().keySet()) {
+//					ForeignKey fKey = table.getForeignKey(fKeyName);
+//					Vector<Column> fKeyColumns = fKey.getFKeyColumns();
+//					// Vector<Column> refKeyColumns =
+//					// fKey.getReferenceKeyColumns();
+//					boolean joinFound = false;
+//					if (joinGraph.getNeighbours(table) != null) {
+//						for (Table joinTable : joinGraph.getNeighbours(table)
+//								.keySet()) {
+//							for (JoinClauseInfo joinClauseInfo : joinGraph
+//									.getEdges(table, joinTable)) {
+//								if (joinClauseInfo.contains(fKey
+//										.getFKTablename())
+//										&& joinClauseInfo.contains(fKey
+//												.getReferenceTable()
+//												.getTableName())) {
+//									// if(joinClause.contains(fKeyColumns) &&
+//									// joinClause.contains(refKeyColumns)){
+//									joinFound = true;
+//								}
+//							}
+//						}
+//					}
+//					if (!joinFound) {
+//						Table referenceTable = fKey.getReferenceTable();
+//						if (query.getBaseRelation().containsKey(
+//								referenceTable.getTableName())) {
+//							continue;
+//						}
+//						if (!selectClause.contains(referenceTable.getTableName())) {
+//							fromClauseString += JoinClauseInfo.leftOuterJoin+ " " + referenceTable.getTableName()+ " ON (";
+//							for (Column fKeyColumn : fKeyColumns) {
+//								if (table.getAliasName() != null)
+//									fromClauseString += table.getAliasName()+ "." + fKeyColumn.getColumnName()+ "=";
+//								else
+//									fromClauseString += table.getTableName()+ "." + fKeyColumn.getColumnName()+ "=";
+//
+//								fromClauseString += fKeyColumn
+//										.getReferenceTableName()
+//										+ "."
+//										+ fKeyColumn.getReferenceColumn()
+//										.getColumnName();
+//								fromClauseString += " AND ";
+//							}
+//							fromClauseString = fromClauseString.substring(0,
+//									fromClauseString.length() - 5);
+//							fromClauseString += ")";
+//
+//							if (!query.getFromTables().containsKey(referenceTable)) {
+//								selectClause += ", "+ referenceTable.getTableName()+ ".CTID AS "+ referenceTable.getTableName()	+ "CTID";
+//								selectClause += ", "+ referenceTable.getTableName() + ".* ";
+//							} 
+//						}
+//					}
+//				}
+//			}// till here: add FK tables to projection list
+//		}
+//  /*
+//		query.setQueryForGroupBy("SELECT DISTINCT " + groupByClause
+//				+ fromClauseString + whereCluase);
+//		// TODO Why is group by clause not added? 
+//		 * 
+//		 */
+//		String modifiedQueryString = selectClause + fromClauseString
+//				+ whereCluase;// +" order by random()";
+//		this.currentAliasTables = new HashMap<String, String>();
+//		if (debug)
+//			logger.log(Level.INFO,"\nModified Query : " + modifiedQueryString);
+//		return modifiedQueryString;  
+//	} 
+//      
 	public void parseQuery(String queryId, String queryString,AppTest_Parameters dbApparameters) throws Exception {
 		try{
 			queryString=queryString.trim().replaceAll("\n+", " ");
@@ -726,7 +729,7 @@ public class QueryParser implements Serializable{
 			throw new Exception("QueryParser.java: parseQuery() : JSQLParser Error : Query Parsing failed for the following query : \n"+queryString+" \n. \n Please check the logs for details.");  
 		}
 	}
-    
+//    
 	public void parseQueryJSQL(String queryId, String queryString, boolean debug, AppTest_Parameters dbApparameters)
 			throws Exception {
 		logger.fine("beginning to parse query");
@@ -1252,7 +1255,8 @@ public class QueryParser implements Serializable{
 	 * @param debug
 	 * @throws Exception
 	 */
-	@Deprecated
+	
+	/*
 	public void parseQuery(String queryId, String queryString, boolean debug,AppTest_Parameters dbApparameters )
 			throws Exception {
 		logger.log(Level.WARNING,"ParseQuery : Call to deprecated Method");
@@ -1321,6 +1325,7 @@ public class QueryParser implements Serializable{
 		}
 
 	}
+	*/
 
 	/**
 	 * This method was used for tokenizing WITH AS queries 

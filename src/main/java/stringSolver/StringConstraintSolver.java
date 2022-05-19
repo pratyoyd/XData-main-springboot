@@ -541,7 +541,9 @@ public class StringConstraintSolver implements Serializable
 		for(StringNode sn:g.node){
 			sn.lessEqual.removeAll(sn.less); //if a var is in both and varEquql list no need to keep it in both
 		}
-		return g.solve();
+		//return g.solve();
+		return null;
+		
 	}
 	
 	/**

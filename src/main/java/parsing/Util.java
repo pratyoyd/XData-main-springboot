@@ -877,11 +877,11 @@ public class Util {
 			for (Column column : rightColumns)
 				columns.add(column);
 
-		} else if (node instanceof FromSubquery) {
+		} /*else if (node instanceof FromSubquery) {
 			FromSubquery fromSubquery = (FromSubquery) node;
 			columns = getJoinColumns(columnName, fromSubquery.getSubquery()
 					.getFromList().getNodeVector().get(0),qParser);
-		}
+		}*/
 		return columns;
 	}
 	

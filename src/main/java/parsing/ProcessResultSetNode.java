@@ -509,6 +509,7 @@ public class ProcessResultSetNode {
 	 * @throws Exception
 	 */
 	@Deprecated
+	/*
 	public static void processResultSetNode (ResultSetNode rsNode,boolean debug,parsing.QueryParser qParser) throws Exception{
 
 
@@ -531,7 +532,7 @@ public class ProcessResultSetNode {
 		 * The fromTableList can contain nodes which are join nodes (or other
 		 * complex nodes - as written by apache derby parser) so need to go
 		 * through the list to identify individual tables.
-		 */
+		 
 
 		qParser.queryAliases = new FromListElement();
 		qParser.queryAliases.setAliasName("Q");
@@ -674,7 +675,7 @@ public class ProcessResultSetNode {
 		//ProjectedColumns.add(tempProjectedCols);
 		qParser.projectedCols.addAll(tempProjectedCols);
 	}
-	
+	*/
 	/**
 	 * This method gets the case statements in where part of the query and adds it to query parser.
 	 * Removes the where condition from the whereclause so that the where clause predicates are not generated
@@ -1000,6 +1001,7 @@ private static RelationHierarchyNode generateRelationHierarchyJSQL(FromItem frmI
 			RelationHierarchyNode r = generateRelationHierarchy(joinNode.getRightResultSet());
 			node = new RelationHierarchyNode("_JOIN_", l, r);
 		}
+		/*
 		else if(rs instanceof SelectNode){
 		
 			SelectNode selectNode = (SelectNode) rs;
@@ -1008,6 +1010,7 @@ private static RelationHierarchyNode generateRelationHierarchyJSQL(FromItem frmI
 			for(QueryTreeNode i : v){
 				node = generateRelationHierarchy(i);
 			}
+			
 
 			List<RelationHierarchyNode> l = new ArrayList<RelationHierarchyNode>();
 			ValueNode w = selectNode.getWhereClause();
@@ -1016,6 +1019,7 @@ private static RelationHierarchyNode generateRelationHierarchyJSQL(FromItem frmI
 				node.setNotExistsSubQueries(l);
 			}
 		}
+		*/
 		
 		return node;
 	}
