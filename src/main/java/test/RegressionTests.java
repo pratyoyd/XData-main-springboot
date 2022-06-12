@@ -53,8 +53,11 @@ public class RegressionTests {
 	}
 	public static Connection getTestConn(String ip,String port, String databaseName,String databaseUser, String databasePassword) throws Exception{
 		Class.forName("org.postgresql.Driver");
+		
 		String loginUrl = "jdbc:postgresql://" + ip + ":" + port + "/" + databaseName;
+		System.out.println(loginUrl);
 		return DriverManager.getConnection(loginUrl, databaseUser, databasePassword);
+		
 	}
 
 	/**

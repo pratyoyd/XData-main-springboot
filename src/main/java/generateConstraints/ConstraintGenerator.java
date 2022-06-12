@@ -43,9 +43,9 @@ public class ConstraintGenerator {
 	 * Constructor
 	 */
 	public ConstraintGenerator(){
-		setConstraintSolver(Configuration.getProperty("smtsolver"));
+		setConstraintSolver(Configuration.smtsolver);
 		
-		 if(Configuration.getProperty("smtsolver").equalsIgnoreCase("cvc3")){
+		 if(Configuration.smtsolver.equalsIgnoreCase("cvc3")){
 			 this.isCVC3 = true;
 			 solverSpecificCommentCharacter="%";
 		 }else {

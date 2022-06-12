@@ -298,9 +298,9 @@ public class PreProcessingActivity {
 
 					/**Initialize cvc3 headers etc>,*/				
 					cvc.initializeOtherDetails();
-					cvc.setConstraintSolver(Configuration.getProperty("smtsolver"));
+					cvc.setConstraintSolver(Configuration.smtsolver);
 					
-					if(Configuration.getProperty("smtsolver").equalsIgnoreCase("cvc3")){
+					if(Configuration.smtsolver.equalsIgnoreCase("cvc3")){
 						cvc.setSolverSpecificCommentCharacter("%");
 					}else{
 						cvc.setSolverSpecificCommentCharacter(";");

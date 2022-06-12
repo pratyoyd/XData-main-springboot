@@ -92,6 +92,12 @@
       <artifactId>spring-boot-starter-data-jpa</artifactId>
       <version>2.3.1.RELEASE</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hibernate-core</artifactId>
+          <groupId>org.hibernate</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -142,6 +148,10 @@
         <exclusion>
           <artifactId>spring-boot-test-autoconfigure</artifactId>
           <groupId>org.springframework.boot</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jakarta.xml.bind-api</artifactId>
+          <groupId>jakarta.xml.bind</groupId>
         </exclusion>
         <exclusion>
           <artifactId>assertj-core</artifactId>
@@ -223,6 +233,12 @@
       <groupId>javax.ws.rs</groupId>
       <artifactId>javax.ws.rs-api</artifactId>
       <version>2.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.3.0</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

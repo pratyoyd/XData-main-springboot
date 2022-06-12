@@ -478,15 +478,15 @@ public class GenerateCVC1 implements Serializable{
 	
 			/**Sort the foreign keys based on topological sorting of foreign keys*/
 			RelatedToPreprocessing.sortForeignKeys(this);
-			this.setConstraintSolver(Configuration.getProperty("smtsolver"));
+			this.setConstraintSolver(Configuration.smtsolver);
 			
-			if(Configuration.getProperty("smtsolver").equalsIgnoreCase("cvc3")){
+			if(Configuration.smtsolver.equalsIgnoreCase("cvc3")){
 				this.setSolverSpecificCommentCharacter("%");
 			}else{
 				this.setSolverSpecificCommentCharacter(";");
 			}
 			
-			if(Configuration.getProperty("smtsolver").equalsIgnoreCase("cvc3")){
+			if(Configuration.smtsolver.equalsIgnoreCase("cvc3")){
 					/**Generate CVC3 Header, This is need to initialize the CVC3 Data Type field of each column of each table */
 					this.setCVC3_HEADER( GetSolverHeaderAndFooter.generateSolver_Header(this) );
 			}else{

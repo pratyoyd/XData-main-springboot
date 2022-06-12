@@ -9,18 +9,22 @@ import java.util.logging.Logger;
 public class Configuration implements ConfigurationInterface{
 	
 	private static Logger logger = Logger.getLogger(Configuration.class.getName());
-	public static String databaseName = getProperty("databaseName");
-	public static String existingDatabaseUser = getProperty("existingDatabaseUser");
-	public static String existingDatabaseUserPasswd = getProperty("existingDatabaseUserPasswd");
+	//public static String databaseName = getProperty("databaseName");
+	//public static String existingDatabaseUser = getProperty("existingDatabaseUser");
+	//public static String existingDatabaseUserPasswd = getProperty("existingDatabaseUserPasswd");
 	
-	public static String testDatabaseUser = getProperty("testDatabaseUser");
-	public static String testDatabaseUserPasswd = getProperty("testDatabaseUserPasswd");
-	public static String databaseIP = getProperty("databaseIP");
-	public static String databasePort = getProperty("databasePort");
-	public static String homeDir= getProperty("homeDir");
-	public static String smtsolver = getProperty("smtsolver");
-	public static String logFile=getProperty("logFile");
-	public static String logLevel=getProperty("logLevel");
+	//public static String testDatabaseUser = getProperty("testDatabaseUser");
+	//public static String testDatabaseUserPasswd = getProperty("testDatabaseUserPasswd");
+	//public static String databaseIP = getProperty("databaseIP");
+	//public static String databasePort = getProperty("databasePort");
+	//public static String homeDir= getProperty("homeDir");
+	//public static String smtsolver = getProperty("smtsolver");
+	//public static String logFile=getProperty("logFile");
+	//public static String logLevel=getProperty("logLevel");
+	public static String homeDir= "../";
+	public static String smtsolver = "cvc3";
+	public static String logFile="";
+	public static String logLevel="INFO";
 	
 	//public static String assignmentFolder= getProperty("assignmentFolder");
 	public static ConfigurationInterface object;
