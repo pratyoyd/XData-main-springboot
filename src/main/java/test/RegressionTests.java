@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 import testDataGen.GenerateDataSet;
 import testDataGen.PopulateTestData;
@@ -18,6 +19,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.apache.ibatis.jdbc.ScriptRunner;
 
 public class RegressionTests {
 
@@ -254,7 +256,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		for(String datasetId:datasets) {
 			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
 				String filePath=queryId+"";
-				
+				String dsPath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+datasetId;
 				
 				GenerateDataSet.loadSchema(testConn, schema);
 				//GenerateDataSet.loadSampleData(testConn, sampleData);
@@ -295,13 +297,159 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 				*/
 			}catch(SQLException e) {
 				e.printStackTrace();
-				return datasetList;
+				List<String> error = new ArrayList<String>(); 
+				error.add("Errors while killing mutation");
+				return error;
+				
+				
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+				e.printStackTrace();
+				List<String> error = new ArrayList<String>(); 
+				error.add("Errors while killing mutation");
+				return error;
+				
+			}
+		}
+		
+		return datasetList;
+	}
+
+	public List<List<String>> allMutantDatabases(Integer queryId, List<String> datasets, String query, String mutant){
+		List<List<String>> mutantdbs = new ArrayList<>();
+		for(String datasetId:datasets) {
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				String dsPath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+datasetId;
+				
+				GenerateDataSet.loadSchema(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
+				ResultSet rs=ptsmt.executeQuery();
+				
+		
+				
+				if(rs.next()) {
+					System.out.println("Mutant caught by: "+ datasetId);
+					String datasetNo = datasetId.substring(2);
+					String datasetFilePath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+datasetId;
+					ArrayList<String> copyFileList=new ArrayList<String>();
+					ArrayList <String> copyFilesWithFk = new ArrayList<String>();
+					Pattern pattern = Pattern.compile("^DS([0-9]+)$");
+					java.util.regex.Matcher matcher = pattern.matcher(datasetId);
+					
+					File ds=new File(dsPath);
+					String copyFiles[] = ds.list();
+					String st ="";
+					for(int j=0;j<copyFiles.length;j++){
+						//	if(copyFiles[j].contains(".ref")){
+						//	copyFileList.add(copyFiles[j].substring(0,copyFiles[j].indexOf(".ref")));
+						//}else{
+
+						copyFileList.add(copyFiles[j].substring(0,copyFiles[j].indexOf(".copy")));
+						//}
+					}
+					List<String> dbvaluesforCurrentMutation = new ArrayList<String>();
+					for(int j=0;j<copyFiles.length;j++){
+
+						String copyFileName = copyFiles[j];
+						
+							//Check for primary keys constraint and add the data to avoid duplicates
+
+
+							String tname =copyFileName.substring(0,copyFileName.indexOf(".copy"));
+
+							BufferedReader br = new BufferedReader(new FileReader(dsPath+"/"+copyFileName));
+							String row ="";
+							while((st=br.readLine())!=null){
+
+								row=copyFileName+" "+st.replaceAll("\\|", "','");
+								
+				}
+							dbvaluesforCurrentMutation.add(row);
+				}
+					mutantdbs.add(dbvaluesforCurrentMutation);
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}
+				
+			}catch(SQLException e) {
+				e.printStackTrace();
+				
+				
+				
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+				
+				
+			}
+		}
+		
+		return mutantdbs;
+	}
+	
+public boolean testMutantKillingExecutable(Integer queryId, List<String> datasets, String query, String mutantFileName) {
+		
+		for(String datasetId:datasets) {
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				
+				
+				GenerateDataSet.loadSchema(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				//String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(query);
+				
+				ResultSet rs=ptsmt.executeQuery();
+				
+			     // Process p = Runtime.getRuntime().exec
+			    	//        ("psql -U " + databaseUser+" -d " + databaseName + " -h "+ serverhost +" -f " + mutantFileName);
+				
+				
+				
+		
+				
+				if(rs.next()) {
+					System.out.println("Mutant caught by: "+ datasetId);
+					return true;
+				}
+				
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}catch(SQLException e) {
+				e.printStackTrace();
+				return true;
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
 		}
 		
-		return datasetList;
+		return false;
 	}
 
 	
@@ -415,12 +563,14 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		Map<Integer,List<String>> mutantMap=new HashMap<Integer,List<String>>();
 		List<String> mutants = new ArrayList<String>();
 		List<String> datasetList = new ArrayList<String>();
+		List<List<String>> mutantDBContent = new ArrayList<>();
 		String result ="";
 		mutants.add(mutantQuery);
 		queryMap.put(1, testQuery);
 		mutantMap.put(1, mutants);
 		
 		List<String> errors=new ArrayList<String>();
+		String exception ="";
 		for(Integer queryId:queryMap.keySet()) {
 			
 			
@@ -431,6 +581,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 			
 			if(datasets==null || datasets.isEmpty()) {
 				errors.add("Exception in generating datasets");
+				exception = "Exception in generating datasets";
 				continue;
 			}
 				
@@ -441,6 +592,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 			} catch (Exception e)	{
 				e.printStackTrace();
 				errors.add("Exception in running query on basic test case");
+				exception = "Exception in running query on basic test case";
 				continue;
 			}
 			System.out.println("Error size after basic dataset: " + errors.size());
@@ -451,9 +603,12 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 					if(testMutantKilling(queryId, datasets, query, mutant)== true)
 						errors.add(mutant);
 					datasetList= testEachMutant(queryId, datasets, query, mutant);
+					mutantDBContent = allMutantDatabases(queryId,datasets,query,mutant);
+					
 				}catch (Exception e)	{
 					e.printStackTrace();
-					errors.add("Exception in killing mutant query:"+mutant);
+					errors.add("Exception in killing mutant query:"+ mutant);
+					exception ="Exception in killing mutant query";
 				}
 			}
 			System.out.println("Error size after mutant killing: " + errors.size());
@@ -469,21 +624,53 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 			
 			
 		}
-		System.out.println(result);
+		
 		JSONObject jsonObject = new JSONObject();
-		if(errors.isEmpty())jsonObject.put("mutantDetected","no");
+		if(!exception.equals("") || datasetList.contains("Errors while killing mutation")){
+			jsonObject.put("mutantDetected","not applicable");
+			JSONArray array = new JSONArray();			
+			
+			jsonObject.put("mutantDatasets", array);
+			if(exception == "")exception = "Errors while killing mutation";
+			jsonObject.put("exceptions", exception);
+	}
+	else {
+		if(errors.isEmpty()) {
+			jsonObject.put("mutantDetected","no");
+			JSONArray array = new JSONArray();
+			for (int i = 0; i < datasetList.size(); i++) {
+				JSONObject mutantdbdetails = new JSONObject();
+				mutantdbdetails.put("mutantDBType",datasetList.get(i));
+				mutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));
+				array.add(mutantdbdetails);
+			}
+			
+			jsonObject.put("mutantDatasets", array);
+			jsonObject.put("exceptions", exception);
+			
+		
+	}
 		else {
 			jsonObject.put("mutantDetected","yes");
 			JSONArray array = new JSONArray();
-			for(String dataset : datasetList)
-			array.add(dataset);
+			for (int i = 0; i < datasetList.size(); i++) {
+				JSONObject mutantdbdetails = new JSONObject();
+				mutantdbdetails.put("mutantDBType",datasetList.get(i));
+				mutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));
+				array.add(mutantdbdetails);
+			}
+			
 			jsonObject.put("mutantDatasets", array);
+			jsonObject.put("exceptions", exception);
 			
 		}
-		return jsonObject;
-		//return result;
+	
+	//return result;
 	}
-	 
+		return jsonObject;
+	}	
+
+	
 	
 	
 	public static void main(String[] args)	throws Exception{
@@ -493,6 +680,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		
 		
 		String basePath="src/main/java/test/universityTest";
+		long startTime = System.currentTimeMillis();
 		readFromJsonAPI(basePath);
 		String databaseName = "";
 		String databaseUser = "";
@@ -505,7 +693,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		//String sampleDataFile="test/universityTest/sampleData_Q3.sql";
 		//String sampleDataFile="test/universityTest/sampleData.sql";
 		/* runtime analysis for regression test */
-		long startTime = System.currentTimeMillis();
+		
 		/*
 		String testQuery = "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE* (1 - L_DISCOUNT)) AS REVENUE, O_ORDERDATE, O_SHIPPRIORITY FROM customer, lineitem, orders WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND C_MKTSEGMENT ='BUILDING' AND O_ORDERDATE <= '1995-03-14' AND L_SHIPDATE >= '1995-03-16' GROUP BY L_ORDERKEY, O_SHIPPRIORITY, O_ORDERDATE ORDER BY REVENUE DESC, O_ORDERDATE ASC LIMIT 5";
 		String mutantQuery = "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE* (1 - L_DISCOUNT)) AS REVENUE, O_ORDERDATE, O_SHIPPRIORITY FROM customer, lineitem, orders WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND C_MKTSEGMENT ='BUILDING' AND O_ORDERDATE <= '1995-03-14' AND L_SHIPDATE >'1995-03-16' GROUP BY L_ORDERKEY, O_SHIPPRIORITY, O_ORDERDATE ORDER BY REVENUE DESC, O_ORDERDATE ASC LIMIT 5";

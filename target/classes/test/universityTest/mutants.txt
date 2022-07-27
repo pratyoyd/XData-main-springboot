@@ -1,0 +1,4 @@
+1|select id, name from student where tot_cred30
+1|select id, name from student
+2|select dept_name,budget from department where budget = 20000
+2|select dept_name from department where budget < 70000

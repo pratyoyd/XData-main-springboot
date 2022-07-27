@@ -1,0 +1,5 @@
+1|select id, name from student where tot_cred>30
+4|select * from instructor, department where instructor.dept_name < department.dept_name
+4|select instructor.dept_name from instructor, department where instructor.dept_name < department.dept_name
+5|select student.name,SUM(course.credits) as sum_credits from student  left join courses on student.dept_name = courses.dept_name  where student.tot_cred < 30 group by student.name order by sum_credits limit 2 
+6|select student.name, department.dept_name, SUM(courses.credits) as sum_credits from student, department, courses where courses.dept_name = department.dept_name and student.dept_name = department.dept_name group by department.dept_name, student.name order by sum_credits limit 2 
