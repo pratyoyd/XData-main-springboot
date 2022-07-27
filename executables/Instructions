@@ -1,0 +1,15 @@
+To run the executables, please read the following:
+
+usage: SQL Query Executable [-d <arg>] [-h] [-l <arg>] [-o <arg>] [-p
+       <arg>] [-u <arg>]
+Provide following inputs
+
+ -d,--dbname <arg>   Database Name
+ -h,--help           Print Help
+ -l,--host <arg>     Host
+ -o,--port <arg>     Port
+ -p,--pass <arg>     Password
+ -u,--user <arg>     Username
+
+
+ Example commands: java -jar Q2.jar  -o "5432" -d "xdatadb" -u "xdatauser" -p "xdatauser" -l "localhost"
