@@ -1,2 +1,0 @@
-ASSERT (O_STUDENT[1] = (_ID__00128, _NAME__Snow, _DEPT_uNAME__Finance, 31));
-ASSERT (O_STUDENT[2] = (_ID__00128, _NAME__Snow, _DEPT_uNAME__Finance, 31));

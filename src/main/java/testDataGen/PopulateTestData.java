@@ -868,6 +868,36 @@ public class PopulateTestData {
 		}
 
 	}
+	public static void deleteAllNonTempTablesFromTestUser(Connection conn) throws Exception{
+		try{
+			DatabaseMetaData dbm = conn.getMetaData();
+			String[] types = {"TABLE"};
+			ResultSet rs = dbm.getTables(conn.getCatalog(), null, "%", types);
+			System.out.println("Resultset size from deleteAllTablesFromTestUser: "+ rs.getFetchSize());
+
+			while(rs.next()){
+				String table=rs.getString("TABLE_NAME");
+				//System.out.println("Table names to be deleted: "+ table);
+				if(!table.equalsIgnoreCase("xdata_temp1")
+						&& !table.equalsIgnoreCase("xdata_temp2")){
+					//PreparedStatement pstmt = conn.prepareStatement("delete from "+table);
+					
+					PreparedStatement pstmt = conn.prepareStatement("drop table "+table +" cascade");
+					System.out.println("Delete Statements from deleteAllTablesFromTestUser: "+ pstmt);
+					pstmt.executeUpdate();
+					pstmt.close();
+				}
+
+			} 
+
+			rs.close();
+			//conn.close();
+			//conn = RegressionTests.getTestConn();
+		}catch(SQLException e){
+			logger.log(Level.SEVERE,e.getMessage(),e);
+		}
+
+	}
 
 	public static void deleteAllTempTables(Connection dbConn) throws Exception{
 		Statement st = dbConn.createStatement();

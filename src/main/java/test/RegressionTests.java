@@ -8,8 +8,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
+import javax.xml.datatype.DatatypeConstants.Field;
+
+import helper.ExecuteJar;
+import helper.MaintainOrder;
 import testDataGen.GenerateDataSet;
 import testDataGen.PopulateTestData;
 import util.Configuration;
@@ -332,6 +337,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 
 				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
 				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println(testQuery);
 				System.out.println("dataset id: " + datasetId);
 				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
 				ResultSet rs=ptsmt.executeQuery();
@@ -372,7 +378,7 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 							String row ="";
 							while((st=br.readLine())!=null){
 
-								row=copyFileName+" "+st.replaceAll("\\|", "','");
+								row="'"+tname+"','"+ st.replaceAll("\\|", "','")+"'";
 								
 				}
 							dbvaluesforCurrentMutation.add(row);
@@ -402,55 +408,6 @@ public List<String> testEachMutant(Integer queryId, List<String> datasets, Strin
 		return mutantdbs;
 	}
 	
-public boolean testMutantKillingExecutable(Integer queryId, List<String> datasets, String query, String mutantFileName) {
-		
-		for(String datasetId:datasets) {
-			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
-				String filePath=queryId+"";
-				
-				
-				GenerateDataSet.loadSchema(testConn, schema);
-				//GenerateDataSet.loadSampleData(testConn, sampleData);
-
-				TableMap tableMap=TableMap.getInstances(testConn, 1);
-				
-				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
-
-				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
-				//String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
-				System.out.println("dataset id: " + datasetId);
-				PreparedStatement ptsmt=testConn.prepareStatement(query);
-				
-				ResultSet rs=ptsmt.executeQuery();
-				
-			     // Process p = Runtime.getRuntime().exec
-			    	//        ("psql -U " + databaseUser+" -d " + databaseName + " -h "+ serverhost +" -f " + mutantFileName);
-				
-				
-				
-		
-				
-				if(rs.next()) {
-					System.out.println("Mutant caught by: "+ datasetId);
-					return true;
-				}
-				
-				/*
-				if (rs.isBeforeFirst() ) {    
-					//System.out.println("Hello from testmutantkilling");
-				    return true;
-				} 
-				*/
-			}catch(SQLException e) {
-				e.printStackTrace();
-				return true;
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return false;
-	}
 
 	
 	public boolean testLimitMutants(String query, String mutant)
@@ -557,13 +514,16 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 		return testResult;
 	}
 	
-	public  JSONObject returnXDataResult(String testQuery,String mutantQuery, String schema, String sampleData ) 
+	public  JSONObject returnXDataResult(String testQuery, String schema, String sampleData, String executablePath, String executableCommand, String fileName, String executableTableName  ) throws IOException 
 	{
+		
+		String mutantQuery = "Select * from student_result";
 		Map<Integer,String> queryMap = new HashMap<Integer,String>() ;
 		Map<Integer,List<String>> mutantMap=new HashMap<Integer,List<String>>();
 		List<String> mutants = new ArrayList<String>();
 		List<String> datasetList = new ArrayList<String>();
 		List<List<String>> mutantDBContent = new ArrayList<>();
+		Map<Integer,List<List<String>>>  resultList = new HashMap<>();
 		String result ="";
 		mutants.add(mutantQuery);
 		queryMap.put(1, testQuery);
@@ -600,10 +560,14 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 			//Check mutation killing
 			for(String mutant:mutantMap.get(queryId))	{
 				try {
-					if(testMutantKilling(queryId, datasets, query, mutant)== true)
+					if(testMutantKilling(queryId, datasets, query,executablePath, executableCommand, fileName,executableTableName )== true)
+					{
 						errors.add(mutant);
-					datasetList= testEachMutant(queryId, datasets, query, mutant);
-					mutantDBContent = allMutantDatabases(queryId,datasets,query,mutant);
+					datasetList= testEachMutant(queryId, datasets, query,executablePath, executableCommand, fileName, executableTableName);
+					mutantDBContent = allMutantDatabases(queryId,datasets,query,executablePath, executableCommand, fileName, executableTableName);
+					resultList =FindResultSetForMutants(queryId,datasets,query,executablePath,executableCommand,fileName,executableTableName );
+					}
+					
 					
 				}catch (Exception e)	{
 					e.printStackTrace();
@@ -623,7 +587,517 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 			
 			
 			
+		}		
+		
+		JSONObject jsonObject = new JSONObject();
+		if(!exception.equals("") || datasetList.contains("Errors while killing mutation")){
+			jsonObject.put("mutantDetected","not applicable");
+			JSONArray array = new JSONArray();			
+			
+			jsonObject.put("mutantDatasets", array);
+			if(exception == "")exception = "Errors while killing mutation";
+			jsonObject.put("exceptions", exception);
+			
+	}
+	else {
+		if(errors.isEmpty()) {
+			jsonObject.put("mutantDetected","no");
+			JSONArray array = new JSONArray();
+			for (int i = 0; i < datasetList.size(); i++) {
+				JSONObject mutantdbdetails = new JSONObject();
+				mutantdbdetails.put("mutantDBType",datasetList.get(i));
+				mutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));
+				mutantdbdetails.put("rsExtracted(Instructor)", "");
+				jsonObject.put("rsHidden(Student)", "");
+				array.add(mutantdbdetails);
+			}
+			
+			jsonObject.put("mutantDatasets", array);
+			
+			
+			jsonObject.put("exceptions", exception);
+			
+		
+	}
+		else {
+			jsonObject.put("mutantDetected","yes");
+			JSONArray array = new JSONArray();
+			for (int i = 0; i < datasetList.size(); i++) {
+				JSONObject mutantdbdetails = new JSONObject();
+				mutantdbdetails.put("mutantDBType",datasetList.get(i));
+				mutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));
+				mutantdbdetails.put("rsExtracted(Instructor)", resultList.get(i).get(0));
+				mutantdbdetails.put("rsHidden(Student)", resultList.get(i).get(1));
+				array.add(mutantdbdetails);
+			}
+			
+			jsonObject.put("mutantDatasets", array);
+			
+			
+			
+			
+			jsonObject.put("exceptions", exception);
+			
 		}
+	
+	//return result;
+	}
+		return jsonObject;
+	}	
+	private List<List<String>> allMutantDatabases(Integer queryId, List<String> datasets, String query, String executablePath,String executableCommand, String fileName,String executableTableName ) {
+		List<List<String>> mutantdbs = new ArrayList<>();
+		for(String datasetId:datasets) {
+			
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				
+				String mutant = "select * from student_result";
+				if(!executableTableName.equals(""))mutant = "select * from "+executableTableName;
+				String dsPath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+datasetId;
+				
+				GenerateDataSet.loadSchema_NotTemp(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+				String runArgs = executableCommand;
+				String jarFile = executablePath + fileName;
+				ExecuteJar.executeJar(jarFile,runArgs);
+				
+				
+
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
+				ResultSet rs=ptsmt.executeQuery();
+				
+		
+				
+				if(rs.next()) {
+					System.out.println("Mutant caught by: "+ datasetId);
+					String datasetNo = datasetId.substring(2);
+					String datasetFilePath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+datasetId;
+					ArrayList<String> copyFileList=new ArrayList<String>();
+					ArrayList <String> copyFilesWithFk = new ArrayList<String>();
+					Pattern pattern = Pattern.compile("^DS([0-9]+)$");
+					java.util.regex.Matcher matcher = pattern.matcher(datasetId);
+					
+					File ds=new File(dsPath);
+					String copyFiles[] = ds.list();
+					String st ="";
+					for(int j=0;j<copyFiles.length;j++){
+						//	if(copyFiles[j].contains(".ref")){
+						//	copyFileList.add(copyFiles[j].substring(0,copyFiles[j].indexOf(".ref")));
+						//}else{
+
+						copyFileList.add(copyFiles[j].substring(0,copyFiles[j].indexOf(".copy")));
+						//}
+					}
+					List<String> dbvaluesforCurrentMutation = new ArrayList<String>();
+					for(int j=0;j<copyFiles.length;j++){
+
+						String copyFileName = copyFiles[j];
+						
+							//Check for primary keys constraint and add the data to avoid duplicates
+
+
+							String tname =copyFileName.substring(0,copyFileName.indexOf(".copy"));
+
+							BufferedReader br = new BufferedReader(new FileReader(dsPath+"/"+copyFileName));
+							String row ="";
+							while((st=br.readLine())!=null){
+
+								row="'"+tname+"','"+ st.replaceAll("\\|", "','")+"'";
+								
+				}
+							dbvaluesforCurrentMutation.add(row);
+				}
+					mutantdbs.add(dbvaluesforCurrentMutation);
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}
+				
+			}catch(SQLException e) {
+				e.printStackTrace();
+				
+				
+				
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+				
+				
+			}
+		}
+		
+		return mutantdbs;
+	}
+
+	private List<String> testEachMutant(Integer queryId, List<String> datasets, String query, String executablePath,String executableCommand, String fileName, String executableTableName ) {
+		List<String> datasetList = new ArrayList<String>();
+		for(String datasetId:datasets) {
+			
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				String mutant = "select * from student_result";
+				if(!executableTableName.equals(""))mutant = "select * from "+executableTableName;
+				String dsPath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+datasetId;
+				
+				GenerateDataSet.loadSchema_NotTemp(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+				String runArgs = executableCommand;
+				String jarFile = executablePath + fileName;
+				ExecuteJar.executeJar(jarFile,runArgs);
+
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
+				ResultSet rs=ptsmt.executeQuery();
+				
+		
+				
+				if(rs.next()) {
+					System.out.println("Mutant caught by: "+ datasetId);
+					String datasetNo = datasetId.substring(2);
+					String datasetFilePath = Configuration.homeDir+"/temp_cvc"+File.separator+filePath+File.separator+"cvc3_"+datasetNo+".cvc";
+					File file = new File(datasetFilePath);
+					Scanner scanner = new Scanner(file);
+					while (scanner.hasNextLine()) {
+						   String lineFromFile = scanner.nextLine();
+						   if(lineFromFile.contains("MUTATION TYPE")) { 
+							String DatasetTypeIndicator = lineFromFile.replace("%MUTATION TYPE: ", "");
+					datasetList.add(DatasetTypeIndicator);
+					System.out.println(DatasetTypeIndicator);
+				
+				}
+					}
+				}
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}catch(SQLException e) {
+				e.printStackTrace();
+				List<String> error = new ArrayList<String>(); 
+				error.add("Errors while killing mutation");
+				return error;
+				
+				
+				
+			} catch(Exception e) {
+				e.printStackTrace();
+				e.printStackTrace();
+				List<String> error = new ArrayList<String>(); 
+				error.add("Errors while killing mutation");
+				return error;
+				
+			}
+		}
+		
+		return datasetList;
+	}
+
+	private boolean testMutantKilling(Integer queryId, List<String> datasets, String query, String executablePath,String executableCommand, String fileName,  String executableTableName  ) {
+		for(String datasetId:datasets) {
+			
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				String mutant = "select * from student_result";
+				if(!executableTableName.equals(""))mutant = "select * from "+executableTableName;
+				
+				GenerateDataSet.loadSchema_NotTemp(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+				String runArgs = executableCommand;
+				String jarFile = executablePath + fileName;
+				ExecuteJar.executeJar(jarFile,runArgs);
+				
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
+				ResultSet rs=ptsmt.executeQuery();
+				
+		
+				
+				if(rs.next()) {
+					System.out.println("Mutant caught by: "+ datasetId);
+					return true;
+				}
+				
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}catch(SQLException e) {
+				e.printStackTrace();
+				return true;
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return false;
+	}
+	
+	private Map<Integer,List<List<String>>> FindResultSetForMutants(Integer queryId, List<String> datasets, String query, String executablePath,String executableCommand, String fileName, String executableTableName ) {
+		Map<Integer,List<List<String>>>  resultList = new HashMap<>();
+		int i =0;
+		for(String datasetId:datasets) {
+			List<List<String>> resultListDB = new ArrayList<>();
+			
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				String mutant = "select * from student_result";
+				if(!executableTableName.equals(""))mutant = "select * from "+executableTableName;
+				
+				GenerateDataSet.loadSchema_NotTemp(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+				String runArgs = executableCommand;
+				String jarFile = executablePath + fileName;
+				ExecuteJar.executeJar(jarFile,runArgs);
+				
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
+				ResultSet rs=ptsmt.executeQuery();
+				
+		
+				
+				if(rs.next()) {
+					List<String> resultInstructor = new ArrayList<String>();
+					List<String> resultStudent = new ArrayList<String>();
+					PreparedStatement ptsmtQuery=testConn.prepareStatement(query);
+					ResultSet rsQuery=ptsmtQuery.executeQuery();
+					while (rsQuery.next()) {
+						
+						//System.out.println("HELLO");
+						ResultSetMetaData rsmd = rsQuery.getMetaData();
+						 int columnsNumberQuery = rsmd.getColumnCount();
+						 if(columnsNumberQuery != 0) {
+					       for (int j = 1; j <= columnsNumberQuery; j++) {
+					           String columnValue = rsQuery.getString(j);
+					           resultInstructor.add(rsmd.getColumnName(j) + ": " +columnValue);
+					       }
+					       }
+					       
+				}
+					
+					PreparedStatement ptsmtMutant=testConn.prepareStatement(mutant);
+					ResultSet rsMutant=ptsmtMutant.executeQuery();
+					while (rsMutant.next()) {
+						
+						//System.out.println("HELLO");
+						ResultSetMetaData rsmd = rsMutant.getMetaData();
+						 int columnsNumberMutant = rsmd.getColumnCount();
+						 if(columnsNumberMutant != 0) {
+					       for (int j = 1; j <= columnsNumberMutant; j++) {
+					           String columnValue = rsMutant.getString(j);
+					           resultStudent.add(rsmd.getColumnName(j) + ": " +columnValue);
+					       }
+					       }
+					       
+				}
+					resultListDB.add(resultInstructor);
+					resultListDB.add(resultStudent);
+					resultList.put(i,resultListDB);
+					i++;
+				}
+				
+				
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}catch(SQLException e) {
+				e.printStackTrace();
+				return resultList;
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return resultList;
+	}
+	private Map<Integer,List<List<String>>> FindResultSetForMutants(Integer queryId, List<String> datasets, String query, String mutant ) {
+		Map<Integer,List<List<String>>>  resultList = new HashMap<>();
+		int i =0;
+		for(String datasetId:datasets) {
+			List<List<String>> resultListDB = new ArrayList<>();
+			
+			try(Connection testConn=getTestConn(getIp(), getPort(), databaseName, databaseUser, databasePassword)){
+				String filePath=queryId+"";
+				
+				
+				GenerateDataSet.loadSchema_NotTemp(testConn, schema);
+				//GenerateDataSet.loadSampleData(testConn, sampleData);
+
+				TableMap tableMap=TableMap.getInstances(testConn, 1);
+				PopulateTestData.loadCopyFileToDataBase(testConn, datasetId, filePath, tableMap);
+				
+				
+				
+				//String testQuery= "with q as ("+query+") , m as("+mutant+") (select * from q EXCEPT ALL m) UNION ALL (select * from m EXCEPT ALL q)";
+				String testQuery="(("+query+") EXCEPT ALL ("+mutant+")) UNION (("+mutant+") EXCEPT ALL ("+query+"))";
+				System.out.println("dataset id: " + datasetId);
+				PreparedStatement ptsmt=testConn.prepareStatement(testQuery);
+				ResultSet rs=ptsmt.executeQuery();
+				
+		
+				
+				if(rs.next()) {
+					List<String> resultInstructor = new ArrayList<String>();
+					List<String> resultStudent = new ArrayList<String>();
+					PreparedStatement ptsmtQuery=testConn.prepareStatement(query);
+					ResultSet rsQuery=ptsmtQuery.executeQuery();
+					while (rsQuery.next()) {
+						
+						//System.out.println("HELLO");
+						ResultSetMetaData rsmd = rsQuery.getMetaData();
+						 int columnsNumberQuery = rsmd.getColumnCount();
+						 if(columnsNumberQuery != 0) {
+					       for (int j = 1; j <= columnsNumberQuery; j++) {
+					           String columnValue = rsQuery.getString(j);
+					           resultInstructor.add(rsmd.getColumnName(j) + ": " +columnValue);
+					       }
+					       }
+					       
+				}
+					
+					PreparedStatement ptsmtMutant=testConn.prepareStatement(mutant);
+					ResultSet rsMutant=ptsmtMutant.executeQuery();
+					while (rsMutant.next()) {
+						
+						//System.out.println("HELLO");
+						ResultSetMetaData rsmd = rsMutant.getMetaData();
+						 int columnsNumberMutant = rsmd.getColumnCount();
+						 if(columnsNumberMutant != 0) {
+					       for (int j = 1; j <= columnsNumberMutant; j++) {
+					           String columnValue = rsMutant.getString(j);
+					           resultStudent.add(rsmd.getColumnName(j) + ": " +columnValue);
+					       }
+					       }
+					       
+				}
+					resultListDB.add(resultInstructor);
+					resultListDB.add(resultStudent);
+					resultList.put(i,resultListDB);
+					i++;
+				}
+				
+				
+				/*
+				if (rs.isBeforeFirst() ) {    
+					//System.out.println("Hello from testmutantkilling");
+				    return true;
+				} 
+				*/
+			}catch(SQLException e) {
+				e.printStackTrace();
+				return resultList;
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return resultList;
+	}
+
+	public  JSONObject returnXDataResult(String testQuery,String mutantQuery, String schema, String sampleData ) 
+	{
+		Map<Integer,String> queryMap = new HashMap<Integer,String>() ;
+		Map<Integer,List<String>> mutantMap=new HashMap<Integer,List<String>>();
+		List<String> mutants = new ArrayList<String>();
+		List<String> datasetList = new ArrayList<String>();
+		List<List<String>> mutantDBContent = new ArrayList<>();
+		Map<Integer, List<List<String>>> resultList =new HashMap<>();
+		String result ="";
+		mutants.add(mutantQuery);
+		queryMap.put(1, testQuery);
+		mutantMap.put(1, mutants);
+		
+		List<String> errors=new ArrayList<String>();
+		String exception ="";
+		for(Integer queryId:queryMap.keySet()) {
+			
+			
+			String query=queryMap.get(queryId);
+			List<String> datasets;
+			//Generate datasets
+			datasets=generateDataSets(queryId,query);
+			
+			if(datasets==null || datasets.isEmpty()) {
+				errors.add("Exception in generating datasets");
+				exception = "Exception in generating datasets";
+				continue;
+			}
+				
+			//Check if DS0 works
+			try {
+				if(testBasicDataset(queryId,query)==false)
+					errors.add("Basic datasets failed");
+			} catch (Exception e)	{
+				e.printStackTrace();
+				errors.add("Exception in running query on basic test case");
+				exception = "Exception in running query on basic test case";
+				continue;
+			}
+			System.out.println("Error size after basic dataset: " + errors.size());
+			
+			//Check mutation killing
+			for(String mutant:mutantMap.get(queryId))	{
+				try {
+					if(testMutantKilling(queryId, datasets, query, mutant)== true) {
+						errors.add(mutant);
+					datasetList= testEachMutant(queryId, datasets, query, mutant);
+					mutantDBContent = allMutantDatabases(queryId,datasets,query,mutant);
+					resultList = FindResultSetForMutants(queryId, datasets,query, mutant);
+					}
+					
+				}catch (Exception e)	{
+					e.printStackTrace();
+					errors.add("Exception in killing mutant query:"+ mutant);
+					exception ="Exception in killing mutant query";
+				}
+			}
+			System.out.println("Error size after mutant killing: " + errors.size());
+			if(errors.isEmpty()) {
+				result="All Test Cases Passed";
+			} else {
+				result+="Following Test Cases Failed";
+				for(Integer i=0;i<errors.size();i++) {
+					result+=errors.get(i);
+				}
+			}
+			
+			
+			
+		}		
 		
 		JSONObject jsonObject = new JSONObject();
 		if(!exception.equals("") || datasetList.contains("Errors while killing mutation")){
@@ -642,6 +1116,7 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 				JSONObject mutantdbdetails = new JSONObject();
 				mutantdbdetails.put("mutantDBType",datasetList.get(i));
 				mutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));
+				
 				array.add(mutantdbdetails);
 			}
 			
@@ -654,12 +1129,23 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 			jsonObject.put("mutantDetected","yes");
 			JSONArray array = new JSONArray();
 			for (int i = 0; i < datasetList.size(); i++) {
-				JSONObject mutantdbdetails = new JSONObject();
-				mutantdbdetails.put("mutantDBType",datasetList.get(i));
-				mutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));
-				array.add(mutantdbdetails);
+				//JSONObject mutantdbdetails = new JSONObject();
+				JSONObject jsonmutantdbdetails= new JSONObject();
+				try {
+				      java.lang.reflect.Field changeMap = jsonObject.getClass().getDeclaredField("map");
+				      changeMap.setAccessible(true);
+				      changeMap.set(jsonObject, new LinkedHashMap<>());
+				      changeMap.setAccessible(false);
+				    } catch (IllegalAccessException | NoSuchFieldException e) {
+				     
+				    }
+				jsonmutantdbdetails.put("mutantDBType",datasetList.get(i));				
+				jsonmutantdbdetails.put("mutantDBContent", mutantDBContent.get(i));	
+				jsonmutantdbdetails.put("rsExtracted(Instructor)", resultList.get(i).get(0));
+				jsonmutantdbdetails.put("rsHidden(Student)", resultList.get(i).get(1));				
+				array.add(jsonmutantdbdetails);
 			}
-			
+			//JSONObject json = (JSONObject) obj
 			jsonObject.put("mutantDatasets", array);
 			jsonObject.put("exceptions", exception);
 			
@@ -669,7 +1155,6 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 	}
 		return jsonObject;
 	}	
-
 	
 	
 	
@@ -686,202 +1171,7 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 		String databaseUser = "";
 		String databasePassword = "";
 		String databaseIP = "";
-		String databasePort = "";
-		//Path of file containing schema
-		//String schemaFile="test/universityTest/DDL_Q3_1.sql";
-		//Path of file containing sampleData
-		//String sampleDataFile="test/universityTest/sampleData_Q3.sql";
-		//String sampleDataFile="test/universityTest/sampleData.sql";
-		/* runtime analysis for regression test */
-		
-		/*
-		String testQuery = "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE* (1 - L_DISCOUNT)) AS REVENUE, O_ORDERDATE, O_SHIPPRIORITY FROM customer, lineitem, orders WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND C_MKTSEGMENT ='BUILDING' AND O_ORDERDATE <= '1995-03-14' AND L_SHIPDATE >= '1995-03-16' GROUP BY L_ORDERKEY, O_SHIPPRIORITY, O_ORDERDATE ORDER BY REVENUE DESC, O_ORDERDATE ASC LIMIT 5";
-		String mutantQuery = "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE* (1 - L_DISCOUNT)) AS REVENUE, O_ORDERDATE, O_SHIPPRIORITY FROM customer, lineitem, orders WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND C_MKTSEGMENT ='BUILDING' AND O_ORDERDATE <= '1995-03-14' AND L_SHIPDATE >'1995-03-16' GROUP BY L_ORDERKEY, O_SHIPPRIORITY, O_ORDERDATE ORDER BY REVENUE DESC, O_ORDERDATE ASC LIMIT 5";
-		
-		//String mutantQuery = "SELECT L_ORDERKEY, SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE, O_ORDERDATE, O_SHIPPRIORITY FROM customer, orders, lineitem WHERE C_CUSTKEY = O_CUSTKEY AND L_ORDERKEY = O_ORDERKEY AND C_MKTSEGMENT ='BUILDING' AND O_ORDERDATE < '1995-03-15' AND L_SHIPDATE > '1995-03-15' GROUP BY L_ORDERKEY,  O_ORDERDATE , O_SHIPPRIORITY ORDER BY REVENUE DESC, O_ORDERDATE LIMIT 10";
-		String  schema =
-		"CREATE   TABLE region  ( R_REGIONKEY  INTEGER NOT NULL,\n"
-		+ "                            R_NAME       CHAR(25) NOT NULL,\n"
-		+ "                            R_COMMENT    VARCHAR(152),\n"
-		+ "                            primary key (R_REGIONKEY)                           \n"
-		+ "                            );\n"
-		+ "                            \n"
-		+ "CREATE   TABLE nation  ( N_NATIONKEY  INTEGER NOT NULL,\n"
-		+ "                            N_NAME       CHAR(25) NOT NULL,\n"
-		+ "                            N_REGIONKEY  INTEGER NOT NULL,\n"
-		+ "                            N_COMMENT    VARCHAR(152),\n"
-		+ "                            primary key (N_NATIONKEY)                             \n"
-		+ "                            );\n"
-		+ "\n"
-		+ "\n"
-		+ "CREATE   TABLE part  ( P_PARTKEY     INTEGER NOT NULL,\n"
-		+ "                          P_NAME        VARCHAR(55) NOT NULL,\n"
-		+ "                          P_MFGR        CHAR(25) NOT NULL,\n"
-		+ "                          P_BRAND       CHAR(10) NOT NULL,\n"
-		+ "                          P_TYPE        VARCHAR(25) NOT NULL,\n"
-		+ "                          P_SIZE        INTEGER NOT NULL,\n"
-		+ "                          P_CONTAINER   CHAR(10) NOT NULL,\n"
-		+ "                          P_RETAILPRICE numeric(15,2) NOT NULL,\n"
-		+ "                          P_COMMENT     VARCHAR(23) NOT NULL ,\n"
-		+ "                          PRIMARY KEY (P_PARTKEY)\n"
-		+ "                          );\n"
-		+ "\n"
-		+ "CREATE   TABLE supplier ( S_SUPPKEY     INTEGER NOT NULL,\n"
-		+ "                             S_NAME        CHAR(25) NOT NULL,\n"
-		+ "                             S_ADDRESS     VARCHAR(40) NOT NULL,\n"
-		+ "                             S_NATIONKEY   INTEGER NOT NULL,\n"
-		+ "                             S_PHONE       CHAR(15) NOT NULL,\n"
-		+ "                             S_ACCTBAL     numeric(15,2) NOT NULL,\n"
-		+ "                             S_COMMENT     VARCHAR(101) NOT NULL,\n"
-		+ "                             PRIMARY KEY (S_SUPPKEY) );\n"
-		+ "\n"
-		+ "CREATE   TABLE partsupp ( PS_PARTKEY     INTEGER NOT NULL,\n"
-		+ "                             PS_SUPPKEY     INTEGER NOT NULL,\n"
-		+ "                             PS_AVAILQTY    INTEGER NOT NULL,\n"
-		+ "                             PS_SUPPLYCOST  numeric(15,2)  NOT NULL,\n"
-		+ "                             PS_COMMENT     VARCHAR(199) NOT NULL,\n"
-		+ "                             PRIMARY KEY (PS_PARTKEY, PS_SUPPKEY)\n"
-		+ "                             );\n"
-		+ "\n"
-		+ "CREATE   TABLE customer ( C_CUSTKEY     INTEGER NOT NULL,\n"
-		+ "                             C_NAME        VARCHAR(25) NOT NULL,\n"
-		+ "                             C_ADDRESS     VARCHAR(40) NOT NULL,\n"
-		+ "                             C_NATIONKEY   INTEGER NOT NULL,\n"
-		+ "                             C_PHONE       CHAR(15) NOT NULL,\n"
-		+ "                             C_ACCTBAL     numeric(15,2)   NOT NULL,\n"
-		+ "                             C_MKTSEGMENT  CHAR(10) NOT NULL,\n"
-		+ "                             C_COMMENT     VARCHAR(117) NOT NULL,\n"
-		+ "                             PRIMARY KEY (C_CUSTKEY) );\n"
-		+ "\n"
-		+ "CREATE   TABLE orders ( O_ORDERKEY       INTEGER NOT NULL,\n"
-		+ "                           O_CUSTKEY        INTEGER NOT NULL,\n"
-		+ "                           O_ORDERSTATUS    CHAR(1) NOT NULL,\n"
-		+ "                           O_TOTALPRICE     numeric(15,2) NOT NULL,\n"
-		+ "                           O_ORDERDATE      DATE NOT NULL,\n"
-		+ "                           O_ORDERPRIORITY  CHAR(15) NOT NULL,  \n"
-		+ "                           O_CLERK          CHAR(15) NOT NULL, \n"
-		+ "                           O_SHIPPRIORITY   INTEGER NOT NULL,\n"
-		+ "                           O_COMMENT        VARCHAR(79) NOT NULL,\n"
-		+ "                           PRIMARY KEY (O_ORDERKEY) );\n"
-		+ "\n"
-		+ "CREATE   TABLE lineitem ( L_ORDERKEY    INTEGER NOT NULL,\n"
-		+ "                             L_PARTKEY     INTEGER NOT NULL,\n"
-		+ "                             L_SUPPKEY     INTEGER NOT NULL,\n"
-		+ "                             L_LINENUMBER  INTEGER NOT NULL,\n"
-		+ "                             L_QUANTITY    numeric(15,2) NOT NULL,\n"
-		+ "                             L_EXTENDEDPRICE  numeric(15,2) NOT NULL,\n"
-		+ "                             L_DISCOUNT    numeric(15,2) NOT NULL,\n"
-		+ "                             L_TAX         numeric(15,2) NOT NULL,\n"
-		+ "                             L_RETURNFLAG  CHAR(1) NOT NULL,\n"
-		+ "                             L_LINESTATUS  CHAR(1) NOT NULL,\n"
-		+ "                             L_SHIPDATE    DATE NOT NULL,\n"
-		+ "                             L_COMMITDATE  DATE NOT NULL,\n"
-		+ "                             L_RECEIPTDATE DATE NOT NULL,\n"
-		+ "                             L_SHIPINSTRUCT CHAR(25) NOT NULL,\n"
-		+ "                             L_SHIPMODE     CHAR(10) NOT NULL,\n"
-		+ "                             L_COMMENT      VARCHAR(44) NOT NULL,\n"
-		+ "                             PRIMARY KEY (L_ORDERKEY, L_LINENUMBER));";
-		String sampleData = 
-				"delete from part;\n"
-				+ "delete from supplier;\n"
-				+ "delete from partsupp;\n"
-				+ "delete from customer;\n"
-				+ "delete from nation;\n"
-				+ "delete from lineitem;\n"
-				+ "delete from region;\n"
-				+ "delete from orders;\n"
-				+ "insert into region values ('0','AFRICA','lar deposits. blithely final packages cajole. regular waters are final requests. regular accounts are according to' );\n"
-				+ "insert into region values ('1','AMERICA','hs use ironic, even requests. s');\n"
-				+ "insert into nation values ('15','MOROCCO','0','rns. blithely bold courts among the closely regular packages use furiously bold platelets?');\n"
-				+ "insert into nation values ('17','PERU','1','platelets. blithely pending dependencies use fluffily across the even pinto beans. carefully silent accoun');\n"
-				+ "insert into nation values ('1','ARGENTINA','1','al foxes promise slyly according to the regular accounts. bold requests alon');\n"
-				+ "insert into nation values ('2','BRAZIL','1','y alongside of the pending deposits. carefully special packages are about the ironic forges. slyly special');\n"
-				+ "insert into nation values ('3','CANADA','1','eas hang ironic, silent packages. slyly regular packages are furiously over the tithes. fluffily bold');\n"
-				+ "insert into customer values ('32','Customer000000032','jD2xZzi UmId,DCtNBLXKj9q0Tlp2iQ6ZcO3J','15','25-430-914-2194','3471.53','BUILDING','cial ideas. final, furious requests across the e');\n"
-				+ "insert into customer values('33','Customer000000033','qFSlMuLucBmx9xnn5ib2csWUweg D','17','27-375-391-1280','78.56','AUTOMOBILE','s. slyly regular accounts are furiously. carefully pending requests');\n"
-				+ "insert into customer values('34','Customer000000034','Q6G9wZ6dnczmtOx509xgE,M2KV','1','25-344-968-5422','8589.70','HOUSEHOLD','nder against the even, pending accounts. even');\n"
-				+ "insert into customer values('35','Customer000000035','Q6G9wZ6dnczmtOx509xgE,M2KV','2','25-344-968-5422','858.70','BUILDING','nder against the even, pending accounts. even');\n"
-				+ "insert into customer values('36','Customer000000036','Q6G9wZ6dnczmtOx509xgE,M2KV','3','25-344-968-5422','85.70','BUILDING','nder against the even, pending accounts. even');\n"
-				+ " insert into part values('1','goldenrod lavender spring chocolate lace','Manufacturer1','Brand13','PROMO BURNISHED COPPER','7','JUMBO PKG','901.00','ly. slyly ironi');\n"
-				+ "insert into part values('2','blush thistle blue yellow saddle','Manufacturer1','Brand13','LARGE BRUSHED BRASS','1','LG CASE','902.00','lar accounts amo');\n"
-				+ "insert into part values('4','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('3','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('5','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('6','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('7','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('8','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('9','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into part values('10','spring green yellow purple cornsilk','Manufacturer4','Brand42','STANDARD POLISHED BRASS','21','WRAP CASE','903.00','egular deposits hag');\n"
-				+ "insert into supplier values('1','Supplier000000001',' N kD4on9OM Ipw3,gf0JBoQDd7tgrzrddZ','17','27-918-335-1736','5755.94','each slyly above the careful');\n"
-				+ "insert into supplier values('2','Supplier000000002','89eJ5ksX3ImxJQBvxObC,','15','15-679-861-2259','4032.68',' slyly bold instructions. idle dependen');\n"
-				+ "insert into supplier values('4','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','15','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('3','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','1','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('5','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','15','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('6','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','1','11-383-516-1199','3987.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('7','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','1','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('8','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','17','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('9','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','2','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into supplier values('10','Supplier000000003','q1,G3Pj6OjIuUYfUoH18BFTKP5aU9bEV3','3','11-383-516-1199','4192.40','blithely silent requests after the express dependencies are slu');\n"
-				+ "insert into partsupp values('4','4','3325','771.64',', even theodolites. regular, final theodolites eat after the carefully pending foxes. furiously regular deposits sleep slyly. carefully bold realms above the ironic dependencies haggle careful');\n"
-				+ "insert into partsupp values('1','1','8076','993.49','ven ideas. quickly even packages print. pending multipliers must have to are fluff');\n"
-				+ "insert into partsupp values('2','2','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('3','3','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('5','5','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('6','6','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('7','7','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even exc)uses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('8','8','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('9','9','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('10','10','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into partsupp values('10','3','3956','337.09','after the fluffily ironic deposits? blithely special dependencies integrate furiously even excuses. blithely silent theodolites could have to haggle pending, express requests fu');\n"
-				+ "insert into orders values ('1','32','O','173665.47','1995-01-02','5-LOW','Clerk000000951','0','nstructions sleep furiously among ');\n"
-				+ "insert into orders values ('2','33','O','46929.18','1996-03-01','1-URGENT','Clerk000000880','0',' foxes. pending accounts at the pending, silent asymptot');\n"
-				+ "insert into orders values ('5','34','F','144659.20','1993-01-30','5-LOW','Clerk000000925','0','quickly. bold deposits sleep slyly. packages use slyly');\n"
-				+ "insert into orders values ('3','32','F','193846.25','1993-10-14','5-LOW','Clerk000000955','0','sly final accounts boost. carefully regular ideas cajole carefully. depos');\n"
-				+ "insert into orders values ('4','33','O','32151.78','1996-01-11','5-LOW','Clerk000000124','0','sits. slyly regular warthogs cajole. regular, regular theodolites acro');\n"
-				+ "insert into orders values ('6','36','O','32151.78','1995-01-11','5-LOW','Clerk000000124','0','sits. slyly regular warthogs cajole. regular, regular theodolites acro');\n"
-				+ "insert into orders values ('7','35','O','32151.78','1995-02-11','5-LOW','Clerk000000124','0','sits. slyly regular warthogs cajole. regular, regular theodolites acro');\n"
-				+ "insert into orders values ('8','36','O','32151.78','1996-03-11','5-LOW','Clerk000000124','0','sits. slyly regular warthogs cajole. regular, regular theodolites acro');\n"
-				+ "insert into orders values ('9','35','O','32151.78','1995-01-11','5-LOW','Clerk000000124','0','sits. slyly regular warthogs cajole. regular, regular theodolites acro');\n"
-				+ "insert into orders values ('10','36','O','32151.78','1997-02-11','5-LOW','Clerk000000124','0','sits. slyly regular warthogs cajole. regular, regular theodolites acro');\n"
-				+ "insert into lineitem values ('1','1','1','1','17','21168.23','0.04','0.02','N','O','1995-03-20','1995-02-12','1995-03-22','DELIVER IN PERSON','TRUCK','egular courts above the');\n"
-				+ "insert into lineitem values ('2','2','2','2','36','45983.16','0.09','0.06','N','O','1996-04-12','1996-02-28','1996-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('5','5','5','5','36','45983.16','0.09','0.06','N','O','1993-04-12','1993-02-28','1993-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('3','3','3','3','28','28955.64','0.09','0.06','N','O','1993-12-21','1993-10-30','1993-12-26','NONE','AIR','lites. fluffily even de');\n"
-				+ "insert into lineitem values ('4','4','4','4','36','45983.16','0.09','0.06','N','O','1996-04-15','1996-02-28','1996-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('6','6','6','6','36','45983.16','0.09','0.06','N','O','1995-04-12','1995-02-28','1995-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('7','7','7','7','36','45983.16','0.09','0.06','N','O','1996-04-12','1996-02-28','1996-04-19','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('8','8','8','8','36','45983.16','0.09','0.06','N','O','1996-04-12','1996-02-28','1996-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('9','9','9','9','36','45983.16','0.09','0.06','N','O','1995-04-12','1995-02-28','1995-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');\n"
-				+ "insert into lineitem values ('10','10','10','10','36','45983.16','0.09','0.06','N','O','1997-04-12','1997-02-28','1997-04-20','TAKE BACK RETURN','MAIL','ly final dependencies: slyly bold');";
-		RegressionTests r=new RegressionTests(schema,sampleData);
-		System.out.println(r.returnXDataResult(testQuery, mutantQuery, schema, sampleData));
-	 	*/		
-		//System.out.println("Starting time of regression test is:");
-        //System.out.println(startTime);
-		/*
-		RegressionTests r=new RegressionTests(basePath,schemaFile,sampleDataFile);
-		Map<Integer,List<String>> errorsMap=r.runRegressionTests();
-		
-		String errors=""; 
-		if(errorsMap==null)
-			System.out.println("Exception......");
-		else if(errorsMap.isEmpty()) {
-			errors="All Test Cases Passed";
-		} else {
-			errors+="Following Test Cases Failed";
-			for(Integer key:errorsMap.keySet()) {
-				errors=key+"|";
-				for(String err:errorsMap.get(key)) {
-					errors+=err+"|";
-				}
-				errors+="\n";
-			}
-		}
-		Utilities.writeFile(basePath+File.separator+"test_result.log", errors);
-		System.out.println("Errors" +errors);
-		
-		//System.out.println("Stopping time of regression test is: ");
-	    //System.out.println(stopTime);*/
+		String databasePort = "";		
 		long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
         System.out.println("Total time taken by regression test is: ");
@@ -896,6 +1186,7 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 		JSONObject extractedQueryJSON = (JSONObject)unmasqueOutput.get("extractedQuery(Instructor)");
 		String testQuery = (String)extractedQueryJSON.get("sqlString");
 		JSONObject inputQueryJSON = (JSONObject)unmasqueOutput.get("hiddenQuery(Student)");
+		String isExecutable = (String)inputQueryJSON.get("isExecutable");
 		String mutantQuery = (String)inputQueryJSON.get("sqlString");
 		System.out.println(testQuery);
 		databaseName = (String)unmasqueOutput.get("databaseName");
@@ -923,19 +1214,38 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 			schema += "PRIMARY KEY ("+primaryKey+")\n);\n\n";
 		}
 		RegressionTests r=new RegressionTests(schema,sampleData);
-		JSONObject jsonobject = r.returnXDataResult(testQuery, mutantQuery, schema, sampleData);
+		JSONObject jsonobject =  new JSONObject();
+		if(isExecutable.equals("n")) {
+			jsonobject = r.returnXDataResult(testQuery, mutantQuery, schema, sampleData);
+			}
 		System.out.println(jsonobject);
 		//System.out.println(r.returnXDataResult(testQuery, mutantQuery, schema, sampleData));
 		
 		
+		
 	}
-	public static JSONObject readFromJsonAPI(JSONObject unmasqueOutput) throws IOException { 
+	public static org.json.JSONObject readFromJsonAPI(JSONObject unmasqueOutput, String filename) throws IOException { 
 		JSONParser parser = new JSONParser();
 		//JSONObject unmasqueOutput = (JSONObject) parser.parse(new FileReader(basePath+File.separator+"apiinput.json"));
 		JSONObject extractedQueryJSON = (JSONObject)unmasqueOutput.get("extractedQuery(Instructor)");
 		String testQuery = (String)extractedQueryJSON.get("sqlString");
 		JSONObject inputQueryJSON = (JSONObject)unmasqueOutput.get("hiddenQuery(Student)");
-		String mutantQuery = (String)inputQueryJSON.get("sqlString");
+		String isExecutable = (String)inputQueryJSON.get("isExecutable");
+		String executableType ="";
+		String executablePath ="";
+		String executableCommand="";
+		String executableTableName = "";
+		String mutantQuery = "";
+		if(isExecutable.equals("n")) {
+			mutantQuery = (String)inputQueryJSON.get("sqlString");
+		}
+		else
+		{
+			executableType = (String)inputQueryJSON.get("executableType");
+			executablePath = (String)inputQueryJSON.get("executablePath");
+			executableCommand = (String)inputQueryJSON.get("executableCommand");
+			executableTableName = (String)inputQueryJSON.get("executableTableName");
+		}
 		System.out.println(testQuery);
 		databaseName = (String)unmasqueOutput.get("databaseName");
 		databaseUser = (String)unmasqueOutput.get("databaseUser");
@@ -962,10 +1272,22 @@ public boolean testMutantKillingExecutable(Integer queryId, List<String> dataset
 			schema += "PRIMARY KEY ("+primaryKey+")\n);\n\n";
 		}
 		RegressionTests r=new RegressionTests(schema,sampleData);
-		JSONObject jsonobject = r.returnXDataResult(testQuery, mutantQuery, schema, sampleData);
-		System.out.println(jsonobject);
-		//System.out.println(r.returnXDataResult(testQuery, mutantQuery, schema, sampleData));
-		return jsonobject;
+		JSONObject jsonObject = new JSONObject();
+		if(isExecutable.equals("n")) {
+		jsonObject = r.returnXDataResult(testQuery, mutantQuery, schema, sampleData);
+		}
+		else {
+		jsonObject = r.returnXDataResult(testQuery, schema, sampleData, executablePath, executableCommand, filename,executableTableName);
+		}
+		System.out.println(jsonObject);
+		ArrayList<String> keyset = new ArrayList<String>();
+		keyset.add("mutantDBType");
+		keyset.add("mutantDBContent");
+		keyset.add("rsExtracted(Instructor)");
+		keyset.add("rsHidden(Student)");
+		org.json.JSONObject jsonObjectFormatted = MaintainOrder.formatJson(jsonObject, keyset);
+		System.out.println(jsonObjectFormatted);
+		return jsonObjectFormatted;
 		
 		
 	}

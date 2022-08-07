@@ -130,6 +130,35 @@ public class GenerateDataSet {
 			}
 		}
 		
+public static void loadSchema_NotTemp(Connection conn,String schema) throws Exception{
+			
+			byte[] dataBytes = null;
+			String tempFile = "";
+			FileOutputStream fos = null;
+			ArrayList<String> listOfQueries = null;
+			ArrayList<String> listOfDDLQueries = new ArrayList<String>();
+			String[] inst = null;
+			
+			dataBytes = schema.getBytes();
+			tempFile = "/tmp/dummy";
+			PopulateTestData.deleteAllNonTempTablesFromTestUser(conn);
+			 fos = new FileOutputStream(tempFile);
+			fos.write(dataBytes);
+			fos.close();
+			listOfQueries = Utilities.createQueries(tempFile);
+			inst = listOfQueries.toArray(new String[listOfQueries.size()]);
+			listOfDDLQueries.addAll(listOfQueries);
+			for (int i = 0; i < inst.length; i++) {
+				 
+				if (!inst[i].trim().equals("") && ! inst[i].trim().contains("drop table")) {
+					String temp = inst[i].trim().replaceAll("(?i)^\\s*create\\s+table\\s+", "create table ");
+					PreparedStatement stmt2 = conn.prepareStatement(temp);
+					//System.out.println(stmt2);
+						stmt2.executeUpdate();	
+					stmt2.close();
+				}
+			}
+		}
 		/**
 		 * Loads datasets for the given connection
 		 * @param conn

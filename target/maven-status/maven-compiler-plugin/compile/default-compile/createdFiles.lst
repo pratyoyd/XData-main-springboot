@@ -90,6 +90,7 @@ killMutations/whereClauseNestedBlock/DistinctMutationsInWhereSubQuery.class
 killMutations/fromClauseNestedBlock/LikeMutationsInFromSubquery.class
 generateConstraints/GenerateJoinPredicateConstraints.class
 stringSolver/AppTest_StringConstraintSolver.class
+helper/MaintainOrder.class
 killMutations/fromClauseNestedBlock/ConstrainedAggregationMutationsInFromSubQuery.class
 killMutations/outerQueryBlock/PartialGroupByMutationsInOuterQueryBlock_case1.class
 killMutations/outerQueryBlock/JoinMutationsInOuterQueryBlock.class
@@ -147,6 +148,7 @@ killMutations/whereClauseNestedBlock/PatternMutationsInWhereSubquery.class
 generateConstraints/TupleRange.class
 util/ConstraintObject.class
 generateConstraints/UtilsRelatedToNode.class
+helper/ExecuteJar.class
 util/InitLogger.class
 parsing/ORNode.class
 killMutations/fromClauseNestedBlock/UnintendedJoinsInFromSubQuery.class

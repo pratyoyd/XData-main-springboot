@@ -37,7 +37,7 @@ public class ExecuteJar
 	 */
 	public static void main(String[] args)
 	{
-		String runArgs = "-o \"5432\" -d \"postgres\" -u \"postgres\" -p \"\" -l \"localhost\" -t \"studrq22\"";
+		String runArgs = "-o \"5432\" -d \"xdatadb\" -u \"xdatauser\" -p Xdatauser@123\"\" -l \"localhost\" ";
 		 
 		 String jarFile = "/Users/manish/executable/Q3.jar";
 		    ExecuteJar.executeJar(jarFile, runArgs);;

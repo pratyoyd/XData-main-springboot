@@ -36,7 +36,7 @@ public class SwaggerConfig {
 
   private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES = 
       new HashSet<String>(Arrays.asList("application/json",
-          "application/xml"));
+          "application/xml","multipart/form-data"));
 
   @Bean
   public Docket api() {

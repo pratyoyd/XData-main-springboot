@@ -1,1 +1,0 @@
-select dept_name,budget from department where budget>40000

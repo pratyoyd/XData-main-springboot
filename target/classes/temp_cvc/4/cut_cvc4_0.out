@@ -1,2 +1,0 @@
-    ((as const (Array Int DEPARTMENT_TupleType))
-    ((as const (Array Int INSTRUCTOR_TupleType))
