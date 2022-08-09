@@ -6,6 +6,12 @@
 
 You need to have a Postgres instance installed in your local system or have access to a remote Postgres instance. You need to have a particular database instance, database user and password with access rights on that database and database ip and ports handy with you. These need to be passed into the input json to XDATA.
 
+### External JARs needed to run XDATA
+
+There was a particular JAR that was not present in maven repository and which we had to install into our local maven repository for the code to work. This is the "jsqlparser-0.9.7-SNAPSHOT.jar" jar inside src/main/java/jars of the codebase. You woult have to install this jar to your local maven repository for the code to work.
+
+Here's a link that might help you do the same: https://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
+
 ## How to execute the XDATA FAT JAR?
 
 To run the jar and expose the API, you need to run the fat jar which has the XDATA code embedded in it. The command required from Terminal is *java -jar target/practice-0.0.1-SNAPSHOT.jar* (if you run it from the base folder of the codebase). This will initialize the Spring servlet and expose the APIs.
@@ -17,18 +23,28 @@ Right now, XDATA exposes two APIs, one where both the instructor and student que
 ### 1. Both SQL Strings
 
 This is hosted in /test/getxdataoutput. We will coming to the input JSON format in a bit..
+
 You can use both Postman and Swagger for calling this API.
-For Postman, you need to send a post request to http://localhost:8080/test/rest/uploadXDATA. You can have the body format as 'raw' and populate the json in the body. Make sure to make the format as 'JSON'.
+#### Postman Steps
+1. Create a post request to http://localhost:8080/test/getxdataoutput 
+2. Change body format to 'raw' and populate the json in the body. 
+3. Make sure to change data type  to 'JSON'.
 ![Screenshot from 2022-08-07 17-48-18](https://user-images.githubusercontent.com/104480282/183290206-635f7b88-ad71-4aaf-aee3-02a422917a08.png)
 
 
-For Swagger, you need to open http://localhost:8080/swagger-ui/index.html#/ in your web browser. In the JSONInput field of the /test/getxdataoutput post request, populate the input JSON. Make sure to change the parameter content type to "application/json".
+#### Swagger Steps
+You need to open http://localhost:8080/swagger-ui/index.html#/ in your web browser. In the JSONInput field of the /test/getxdataoutput post request, populate the input JSON. Make sure to change the parameter content type to "application/json".
 
 ![Screenshot from 2022-08-07 17-49-40](https://user-images.githubusercontent.com/104480282/183290256-b144e857-8b88-4002-b003-fe053a310854.png)
 
 ### 2. Instructor: SQL String and Student: JSON
 
-This currently works through Postman. You need to go send a post request to the URL: http://localhost:8080/test/rest/uploadXDATA. Change the body type to form data. Upload your input SQL jar in the field for "file". Upload your input json in the field called jsonInput. Make sure to change the format of input to text.
+This currently works through Postman.
+
+1. Create a post request to the URL: http://localhost:8080/test/rest/uploadXDATA. 
+2. Change the body type to "form-data". 
+3. The form will have 2 inputs - file and jsonInput. file accepts input of type of "file" and jsonInput accepts inputs of type "text".
+4. Upload your input SQL jar in the field for file. Upload your input json in the field for jsonInput.
 ![Screenshot from 2022-08-07 17-44-35](https://user-images.githubusercontent.com/104480282/183290125-8631dcb4-85fa-43fc-a54a-6c1efac41696.png)
 
 ## What kind of JARs does XDATA accept?
@@ -62,7 +78,10 @@ Since I have used Eclipse exclusively, so this is assuming you are using Eclipse
 
 ### Sample Input JSON
 
-[apiinput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9276818/apiinput.txt)
+[apiinput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9276818/apiinput.txt) - Executable hidden query
+
+[apiinput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9292984/apiinput.txt) - SQL hidden query
+
 
 
 ## Output JSON fields and sample Output JSON
@@ -81,6 +100,16 @@ rsHidden(Student): Result produced by Student query on the mutant db.
 
 
 [apioutput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9276815/apioutput.txt)
+
+## Scope of Queries handled by XDATA
+
+XDATA is not guranteed to detect mutants in the following cases:-
+
+
+1. If the mutation is in the limit mutation.
+2. If the student query has more filters than the instructor query in addition to having all the mutations present in the instructor query
+3. Any mutation in quadratic or higher order combination of input columns
+4. Any student query which has 2 or more mutations than the instructor query.
 
 
 
