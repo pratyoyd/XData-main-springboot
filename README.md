@@ -79,7 +79,8 @@ Since I have used Eclipse exclusively, so this is assuming you are using Eclipse
 ### Sample Input JSON
 [apiinput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9299321/apiinput.txt) - Executable hidden query
 
-[apiinput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9292984/apiinput.txt) - SQL hidden query
+
+[apiinput.txt](https://github.com/pratyoyd/XData-main-springboot/files/9299353/apiinput.txt) - SQL hidden query
 
 
 
