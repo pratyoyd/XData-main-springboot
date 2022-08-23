@@ -38,7 +38,7 @@ import io.swagger.v3.oas.annotations.Operation;
 @RequestMapping("/test")
 public class TestController {
 	private final Logger logger = LoggerFactory.getLogger(TestController.class);
-	private static String UPLOADED_FOLDER = "/tmp/uploads/";
+	
 	@GetMapping("/hello")
 	public String getGreetings() {
 		return "Hello";
@@ -72,11 +72,12 @@ public class TestController {
 	 @Operation(summary = "Upload a single File")
 	   public ResponseEntity < ? > uploadFile(@RequestParam("file") MultipartFile uploadfile) {
 	      logger.debug("Single file upload!");
+	       String uploadedFolder = "/tmp/uploads/";
 	      if (uploadfile.isEmpty()) {
 	         return new ResponseEntity("You must select a file!", HttpStatus.OK);
 	      }
 	      try {
-	         saveUploadedFiles(Arrays.asList(uploadfile));
+	         saveUploadedFiles(Arrays.asList(uploadfile), uploadedFolder);
 	      } catch (IOException e) {
 	         return new ResponseEntity < > (HttpStatus.BAD_REQUEST);
 	      }
@@ -89,16 +90,21 @@ public class TestController {
 	public JSONObject uploadFile2(@RequestParam("file") MultipartFile uploadfile,@RequestParam String jsonInput) throws ParseException, IOException {
 	      logger.debug("Single file upload!");
 	      JSONParser parser = new JSONParser();
-	      if (uploadfile.isEmpty()) {
-	         return (JSONObject) parser.parse("You must select a file!");
-	      }
-	      try {
-	         saveUploadedFiles(Arrays.asList(uploadfile));
-	      } catch (IOException e) {
-	         return (JSONObject) parser.parse (e.toString());
-	      }
+	      
 			
 			JSONObject jsonObj = (JSONObject)parser.parse(jsonInput);
+			JSONObject inputQueryJSON = (JSONObject)jsonObj.get("hiddenQuery(Student)");
+			String uploadedFolder = (String)inputQueryJSON.get("executablePath");
+			
+			if (uploadfile.isEmpty()) {
+		         return (JSONObject) parser.parse("You must select a file!");
+		      }
+		      try {
+		         saveUploadedFiles(Arrays.asList(uploadfile), uploadedFolder);
+		      } catch (IOException e) {
+		         return (JSONObject) parser.parse (e.toString());
+		      }
+		      
 			org.json.JSONObject jsonOutput = RegressionTests.readFromJsonAPI(jsonObj,uploadfile.getOriginalFilename());
 			System.out.println(jsonOutput);
 			String mutdbsStr = (String) jsonOutput.toString();	
@@ -108,8 +114,8 @@ public class TestController {
 	      //return new ResponseEntity(RegressionTests.readFromJsonAPI(jsonobj,uploadfile.getOriginalFilename()), new HttpHeaders(), HttpStatus.OK);
 		   }
 	
-	private void saveUploadedFiles(List < MultipartFile > files) throws IOException {
-		File folder = new File(UPLOADED_FOLDER);
+	private void saveUploadedFiles(List < MultipartFile > files, String uploadedFolder) throws IOException {
+		File folder = new File(uploadedFolder);
 		if (!folder.exists()) {
 			folder.mkdir();
 		}
@@ -119,7 +125,7 @@ public class TestController {
 				// next pls
 			}
 			byte[] bytes = file.getBytes();
-			Path path = Paths.get(UPLOADED_FOLDER + file.getOriginalFilename());
+			Path path = Paths.get(uploadedFolder + file.getOriginalFilename());
 			Files.write(path, bytes);
 		}
 	
