@@ -12,6 +12,9 @@ There was a particular JAR that was not present in maven repository and which we
 
 Here's a link that might help you do the same: https://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html
 
+### CVC3 executable
+You will need to take the CVC3 executable from the repo and upload it to the usr/bin folder of your local system (in case of a Linux system) in order for the CVC3 constraint solver to work properly.
+
 ## How to execute the XDATA FAT JAR?
 
 To run the jar and expose the API, you need to run the fat jar which has the XDATA code embedded in it. The command required from Terminal is *java -jar target/practice-0.0.1-SNAPSHOT.jar* (if you run it from the base folder of the codebase). This will initialize the Spring servlet and expose the APIs.
